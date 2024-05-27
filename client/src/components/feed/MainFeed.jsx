@@ -9,6 +9,21 @@ const MainFeed = () => {
     <MainFeedBlock>
       <h2>메인 피드!!!!</h2>
       <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
+      <img src={logo} alt="" />
     </MainFeedBlock>
   );
 };
