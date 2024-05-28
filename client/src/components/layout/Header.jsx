@@ -9,7 +9,9 @@ const Header = () => {
     <HeaderBlock>
       <h1>헤더!!</h1>
       <div>
-        <Link to='/join'>회원가입</Link>
+        <p>이메일</p>
+        <p>비밀번호</p>
+        <Link to='/join'>가입하기</Link>
       </div>
     </HeaderBlock>
   );
