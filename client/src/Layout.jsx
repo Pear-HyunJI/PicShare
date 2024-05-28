@@ -4,7 +4,9 @@ import { Outlet } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useMediaQuery } from "react-responsive";
-import logo from "./assets/images/PicShare.png";
+import logo from "@/assets/images/PicShare.png";
+import screenShot from "@/assets/images/screenShot.png";
+import screenShot2 from "@/assets/images/screenShot2.png";
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -12,6 +14,14 @@ const LayoutWrapper = styled.div`
   overflow-y: hidden;
   justify-content: space-evenly;
   background-color: #f2f2f2;
+  .screenShotWrapper {
+    display: flex; 
+    width: 100%; 
+    justify-content: space-evenly;
+  }
+  .screenShot, .screenShot2 {
+    width: 45%; 
+  }
 
   @media (max-width: 1200px) {
     display: block;
@@ -25,7 +35,7 @@ const LeftLayoutBlock = styled.div`
   position: sticky;
   top: 0;
   margin: 0 50px;
-  padding-top: 250px;
+  padding-top: 150px;
   text-align: center;
 
   display: flex;
@@ -34,7 +44,7 @@ const LeftLayoutBlock = styled.div`
   p {
     font-size: 25px;
     font-weight: 600;
-    margin-top: 35px;
+    margin: 35px auto;
     color: #0d0d0d;
   }
 `;
@@ -69,6 +79,10 @@ const Layout = () => {
           <p>
             사진으로 연결되는 세상, <br /> PicShare와 함께.
           </p>
+          <div className="screenShotWrapper">
+            <img src={screenShot} alt="스크린샷" className="screenShot"/>
+            <img src={screenShot2} alt="스크린샷2" className="screenShot2"/>
+          </div>
         </LeftLayoutBlock>
       )}
       <RightLayoutBlock>
