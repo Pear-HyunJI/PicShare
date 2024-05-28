@@ -8,11 +8,8 @@ const Header = () => {
   return (
     <HeaderBlock>
       <h1>헤더!!</h1>
-      <div>
-        <p>이메일</p>
-        <p>비밀번호</p>
-        <Link to='/join'>가입하기</Link>
-      </div>
+      <h1>헤더!!</h1>
+      <h1>헤더!!</h1>
     </HeaderBlock>
   );
 };
