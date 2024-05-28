@@ -7,7 +7,7 @@ const MainFeedBlock = styled.div``;
 const MainFeed = () => {
   return (
     <MainFeedBlock>
-      <h2>메인 피드!!!!</h2>
+      <h2>메인 피드!!!ddddddddddddddd</h2>
       <img src={logo} alt="" />
       <img src={logo} alt="" />
       <img src={logo} alt="" />
