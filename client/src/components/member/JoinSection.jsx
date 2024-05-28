@@ -1,98 +1,199 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 import logo from "../../assets/images/PicShare.png";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const JoinSectionBlock = styled.div`
-    max-width:345px;
-    margin:50px auto;
-    text-align:center;
-    color:gray;
-    .top {
-        margin:20px 0; 
-        p {
-            margin:20px 0;
-        }
-        button {
-            width:95%;
-            height:40px;
-            background:#ccc;
-            color:#fff;
-            border-radius:10px;
-            &:hover{background:gray;}
-        }
+  max-width: 345px;
+  margin: 50px auto;
+  text-align: center;
+  color: gray;
+  .top {
+    margin: 20px 0;
+    p {
+      margin: 20px 0;
     }
-    table {
-        width: 100%;
-        td {
-            padding: 10px;
-            text-align: left;
-
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+    button {
+      width: 95%;
+      height: 40px;
+      background: #ccc;
+      color: #fff;
+      border-radius: 10px;
+      &:hover {
+        background: gray;
+      }
     }
-    .btn {
-        margin:20px 0;
-        button {
-            margin-bottom:50px;
-            width:95%;
-            height:40px;
-            background:#ccc;
-            color:#fff;
-            border-radius:10px;
-            &:hover{background:gray;}
-        }
-        .textColor {color:#09fc52;}
+  }
+  table {
+    width: 100%;
+    td {
+      padding: 10px;
+      text-align: left;
     }
+    input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  }
+  .btn {
+    margin: 20px 0;
+    button {
+      margin-bottom: 50px;
+      width: 95%;
+      height: 40px;
+      background: #ccc;
+      color: #fff;
+      border-radius: 10px;
+      &:hover {
+        background: gray;
+      }
+    }
+    .textColor {
+      color: #09fc52;
+    }
+  }
 `;
 
 const JoinSection = () => {
-    return (
-        <JoinSectionBlock>
-            <form> 
-                <div className='top'>
-                    <img src={logo} alt="" className='logo'/>
-                    <p>친구들의 사진과 동영상을 보려면 가입하세요.</p>
-                    <button>Facebook으로 로그인</button>
-                    <p style={{ color:'gray'}}>­―――――――――&nbsp;&nbsp;또는&nbsp;&nbsp;―――――――――</p>
-                </div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input type="text" name="userId" id="userId" placeholder="이메일 주소" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="text" name="userIrum" id="userIrum" placeholder="성명" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="text" name="nickname" id="nickname" placeholder="닉네임" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="password" name="userPw" id="userPw" placeholder="비밀번호" />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div className="btn">
-                    <button type="submit">가입</button>
-                    <p>이미 계정이 있으신가요?&nbsp;&nbsp;<Link to="/login" className='textColor'>로그인</Link></p>
-                </div>
-            </form>
-        </JoinSectionBlock>
-    );
+  const emailRef = useRef();
+  const userNameRef = useRef();
+  const userNicknameRef = useRef();
+  const passwordRef = useRef();
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    userName: "",
+    userNickname: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    const { value, name } = e.target;
+    setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
+  };
+
+  const register = async (e) => {
+    e.preventDefault();
+    // setError({ email: "", userName: "", userNickname: "", password: "" }); // reset errors
+    // const addMember = {
+    //   email: userInfo.email,
+    //   userName: userInfo.userName,
+    //   userNickname: userInfo.userNickname,
+    //   password: userInfo.password,
+    // };
+    axios
+      .post("http://localhost:8001/auth/join", {
+        email: userInfo.email,
+        userName: userInfo.userName,
+        userNickname: userInfo.userNickname,
+        password: userInfo.password,
+      })
+      .then((res) => {
+        console.log("회원가입중", res);
+        if (res.data.affectedRows === 1) {
+          alert("회원가입이 성공했습니다.");
+        } else {
+          alert("회원가입에 실패했습니다.");
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  return (
+    <JoinSectionBlock>
+      <form onSubmit={register}>
+        <div>
+          <img src={logo} alt="PicShare" className="logo" />
+          <p>친구들의 사진과 동영상을 보려면 가입하세요.</p>
+          <button type="button">Facebook으로 로그인</button>
+          <p>­ ―――――― 또는 ―――――― </p>
+        </div>
+        <table border="1">
+          <colgroup>
+            <col />
+          </colgroup>
+          <tbody>
+            <tr>
+              <td>
+                <label htmlFor="email">이메일 주소</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="email"
+                  id="email"
+                  ref={emailRef}
+                  value={userInfo.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                  required
+                />
+                {/* {error.email && <p className="error">{error.email}</p>} */}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="userName">성명</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="userName"
+                  id="userName"
+                  ref={userNameRef}
+                  value={userInfo.userName}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  required
+                />
+                {/* {error.userName && <p className="error">{error.userName}</p>} */}
+              </td>
+            </tr>
+            <tr>
+              <td>닉네임</td>
+              <td>
+                <input
+                  type="text"
+                  name="userNickname"
+                  id="userNickname"
+                  ref={userNicknameRef}
+                  value={userInfo.userNickname}
+                  onChange={handleChange}
+                  placeholder="Usernickame"
+                  required
+                />
+                {/* {error.userNickname && (
+                  <p className="error">{error.userNickname}</p>
+                )} */}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="password">비밀번호</label>
+              </td>
+              <td>
+                <input
+                  name="password"
+                  id="password"
+                  ref={passwordRef}
+                  value={userInfo.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  required
+                />
+                {/* {error.password && <p className="error">{error.password}</p>} */}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="btn">
+          <button type="submit">가입</button>
+        </div>
+      </form>
+    </JoinSectionBlock>
+  );
 };
 
 export default JoinSection;
