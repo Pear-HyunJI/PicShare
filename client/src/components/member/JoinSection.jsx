@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import logo from "../../assets/images/PicShare.png";
+import {Link} from "react-router-dom";
 
 const JoinSectionBlock = styled.div`
     max-width:345px;
@@ -8,7 +9,7 @@ const JoinSectionBlock = styled.div`
     text-align:center;
     color:gray;
     .top {
-        margin:30px 0; 
+        margin:20px 0; 
         p {
             margin:20px 0;
         }
@@ -18,6 +19,7 @@ const JoinSectionBlock = styled.div`
             background:#ccc;
             color:#fff;
             border-radius:10px;
+            &:hover{background:gray;}
         }
     }
     table {
@@ -36,14 +38,17 @@ const JoinSectionBlock = styled.div`
         }
     }
     .btn {
-        margin-top:20px;
+        margin:20px 0;
         button {
+            margin-bottom:50px;
             width:95%;
             height:40px;
             background:#ccc;
             color:#fff;
             border-radius:10px;
+            &:hover{background:gray;}
         }
+        .textColor {color:#09fc52;}
     }
 `;
 
@@ -55,7 +60,7 @@ const JoinSection = () => {
                     <img src={logo} alt="" className='logo'/>
                     <p>친구들의 사진과 동영상을 보려면 가입하세요.</p>
                     <button>Facebook으로 로그인</button>
-                    <p style={{ color:'#ccc'}}>­―――――――――&nbsp;&nbsp;또는&nbsp;&nbsp;―――――――――</p>
+                    <p style={{ color:'gray'}}>­―――――――――&nbsp;&nbsp;또는&nbsp;&nbsp;―――――――――</p>
                 </div>
                 <table>
                     <tbody>
@@ -83,6 +88,7 @@ const JoinSection = () => {
                 </table>
                 <div className="btn">
                     <button type="submit">가입</button>
+                    <p>이미 계정이 있으신가요?&nbsp;&nbsp;<Link to="/login" className='textColor'>로그인</Link></p>
                 </div>
             </form>
         </JoinSectionBlock>
