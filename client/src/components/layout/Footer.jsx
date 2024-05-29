@@ -23,7 +23,10 @@ const Footer = () => {
       {user ? (
         <div>
           <h2>푸터</h2>
-          <p>로그인 됐음({user.email})</p>
+          <p>로그인 됐음</p>
+          <Link to="/personalpage">
+            유저 개인 페이지로 이동({user.userNickname})
+          </Link>
           <a href="#" onClick={handleLogout}>
             로그아웃
           </a>

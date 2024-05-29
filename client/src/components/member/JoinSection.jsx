@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../../assets/images/PicShare.png";
 
 const JoinSectionBlock = styled.div`
@@ -40,7 +41,7 @@ const JoinSectionBlock = styled.div`
     }
   }
   .btn {
-    margin: 20px 0;
+    margin-top: 20px 0;
     button {
       margin-bottom: 50px;
       width: 95%;
@@ -169,21 +170,17 @@ const JoinSection = () => {
   return (
     <JoinSectionBlock>
       <form onSubmit={register}>
-        <div>
+        <div className="top">
           <img src={logo} alt="PicShare" className="logo" />
           <p>친구들의 사진과 동영상을 보려면 가입하세요.</p>
           <button type="button">Facebook으로 로그인</button>
-          <p>­ ―――――― 또는 ―――――― </p>
+          <p style={{ color: "gray" }}>
+            ­―――――――――&nbsp;&nbsp;또는&nbsp;&nbsp;―――――――――
+          </p>
         </div>
-        <table border="1">
-          <colgroup>
-            <col />
-          </colgroup>
+        <table>
           <tbody>
             <tr>
-              <td>
-                <label htmlFor="email">이메일 주소</label>
-              </td>
               <td>
                 <input
                   type="text"
@@ -201,9 +198,6 @@ const JoinSection = () => {
             </tr>
             <tr>
               <td>
-                <label htmlFor="userName">성명</label>
-              </td>
-              <td>
                 <input
                   type="text"
                   name="userName"
@@ -218,7 +212,6 @@ const JoinSection = () => {
               </td>
             </tr>
             <tr>
-              <td>닉네임</td>
               <td>
                 <input
                   type="text"
@@ -240,9 +233,6 @@ const JoinSection = () => {
             </tr>
             <tr>
               <td>
-                <label htmlFor="password">비밀번호</label>
-              </td>
-              <td>
                 <input
                   type="password"
                   name="password"
@@ -260,6 +250,12 @@ const JoinSection = () => {
         </table>
         <div className="btn">
           <button type="submit">가입</button>
+          <p>
+            이미 계정이 있으신가요?&nbsp;&nbsp;
+            <Link to="/login" className="textColor">
+              로그인
+            </Link>
+          </p>
         </div>
       </form>
     </JoinSectionBlock>
