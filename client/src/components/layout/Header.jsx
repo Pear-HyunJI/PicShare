@@ -16,12 +16,22 @@ const HeaderBlock = styled.div`
     display: flex;
     justify-content: space- between;
     align-items: center;
-    
   }
 `;
 
 const Search = styled.div`
-  font-size: 30px;
+  font-size: 25px;
+  margin-right: 5px;
+  display: flex;
+  justify-content: space- between;
+  align-items: center;
+  input {
+    border: 1px solid #e8ecf2;
+    font-size: 16px;
+    padding: 10px 20px;
+    max-width: 200px;
+    margin-left: 10px;
+  }
 `;
 
 const Like = styled.div`
@@ -44,8 +54,9 @@ const Header = () => {
       </div>
       <div className="menu">
       <Search>
-        <Link to="/"><FaSearch /></Link>
-        </Search>
+        <FaSearch /><input type="text" placeholder="검색어를 입력하세요."/>
+        {/* 나중에 검색기능 도입 */}
+      </Search>
         <Like>
           <Link to="/"><FaHeart/></Link>
           {/* <FaRegHeart/> */}
@@ -53,7 +64,6 @@ const Header = () => {
         <Dm>
         <Link to="/"><AiFillMessage /></Link>
         </Dm>
-        
       </div>
     </HeaderBlock>
   );

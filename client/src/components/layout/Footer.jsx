@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "@/store/member";
 import { FaUserCheck, FaUserTimes } from "react-icons/fa";
-import { CiCirclePlus } from "react-icons/ci";
+import { FaCirclePlus } from "react-icons/fa6";
 
 const FooterBlock = styled.div`
   padding: 15px;
@@ -50,7 +50,7 @@ const Footer = () => {
         <div className="menu">
           {/* <h2>푸터</h2> */}
           <Loginout><a href="#" onClick={handleLogout}><FaUserCheck /></a></Loginout>
-          <Upload><Link to="/feedinsert"><CiCirclePlus /></Link></Upload>
+          <Upload><Link to="/feedinsert"><FaCirclePlus /></Link></Upload>
           <Profile><Link to="/personalpage">프로필({user.userNickname})</Link></Profile>
           
         </div>
