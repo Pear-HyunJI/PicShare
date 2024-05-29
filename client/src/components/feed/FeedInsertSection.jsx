@@ -21,17 +21,66 @@ const FeedInsertSectionBlock = styled.form`
 
   textarea {
     resize: none;
+    height: 150px;
   }
 
-  .images {
+  .image-upload-section {
     display: flex;
     gap: 10px;
 
-    img {
-      width: 100px;
+    .images {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 300px;
       height: 100px;
-      object-fit: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+      }
+
+      span {
+        font-size: 12px;
+        color: #aaa;
+      }
     }
+
+    input {
+      flex: 1;
+    }
+  }
+
+  .hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    .hashtag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      input {
+        width: 200px;
+      }
+
+      button {
+        background-color: #ccc;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+      }
+    }
+  }
+
+  .scheduled-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 `;
 
@@ -40,12 +89,23 @@ const FeedInsertSection = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
-  const [hashtags, setHashtags] = useState("");
+  const [hashtags, setHashtags] = useState([""]);
   const [scheduledAt, setScheduledAt] = useState("");
+  const [isScheduled, setIsScheduled] = useState(false);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     setImages(files);
+  };
+
+  const handleHashtagChange = (index, value) => {
+    const newHashtags = [...hashtags];
+    newHashtags[index] = value;
+    setHashtags(newHashtags);
+  };
+
+  const handleAddHashtag = () => {
+    setHashtags([...hashtags, ""]);
   };
 
   const handleSave = async (isImmediate) => {
@@ -55,7 +115,7 @@ const FeedInsertSection = () => {
     images.forEach((file) => {
       formData.append("images", file);
     });
-    formData.append("hashtags", hashtags);
+    formData.append("hashtags", hashtags.join(" "));
 
     if (!isImmediate) {
       formData.append("scheduled_at", scheduledAt || null);
@@ -86,44 +146,70 @@ const FeedInsertSection = () => {
     <FeedInsertSectionBlock
       onSubmit={(e) => {
         e.preventDefault();
-        handleSave(true); // Immediate post
+        handleSave(!isScheduled); // Immediate post if not scheduled
       }}
     >
       <p>{user.userNo}</p>
+      <div className="image-upload-section">
+        <div className="images">
+          {images.length > 0 ? (
+            images.map((file, idx) => (
+              <img
+                key={idx}
+                src={URL.createObjectURL(file)}
+                alt="upload preview"
+              />
+            ))
+          ) : (
+            <span>Photo</span>
+          )}
+        </div>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleImageUpload}
+        />
+      </div>
       <textarea
         placeholder="피드 내용을 입력하세요..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
-      <input
-        type="file"
-        multiple
-        accept="image/*"
-        onChange={handleImageUpload}
-      />
-      <div className="images">
-        {Array.from(images).map((file, idx) => (
-          <img key={idx} src={URL.createObjectURL(file)} alt="upload preview" />
+      <div className="hashtags">
+        {hashtags.map((hashtag, idx) => (
+          <div className="hashtag" key={idx}>
+            <span>#</span>
+            <input
+              type="text"
+              placeholder={`${idx + 1}번째 해시태그를 입력하세요`}
+              value={hashtag}
+              onChange={(e) => handleHashtagChange(idx, e.target.value)}
+            />
+          </div>
         ))}
+        <button type="button" onClick={handleAddHashtag}>
+          +
+        </button>
       </div>
-      <input
-        type="text"
-        placeholder="해시태그를 입력하세요 (스페이스로 구분)"
-        value={hashtags}
-        onChange={(e) => setHashtags(e.target.value)}
-      />
-      <input
-        type="datetime-local"
-        value={scheduledAt}
-        onChange={(e) => setScheduledAt(e.target.value)}
-      />
+      <div className="scheduled-section">
+        <label>
+          <input
+            type="checkbox"
+            checked={isScheduled}
+            onChange={() => setIsScheduled(!isScheduled)}
+          />
+          예약포스팅
+        </label>
+        {isScheduled && (
+          <input
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+          />
+        )}
+      </div>
       <button type="submit">포스팅</button>
-      <button
-        type="button"
-        onClick={() => handleSave(false)} // Scheduled post
-      >
-        예약포스팅
-      </button>
       <button type="button" onClick={handleBack}>
         뒤로가기
       </button>
