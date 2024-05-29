@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import logo from "../../assets/images/PicShare.png";
-import { Link } from "react-router-dom";
 
 const JoinSectionBlock = styled.div`
   max-width: 345px;
@@ -55,6 +55,11 @@ const JoinSectionBlock = styled.div`
       color: #09fc52;
     }
   }
+  .error {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
 `;
 
 const JoinSection = () => {
@@ -68,37 +73,80 @@ const JoinSection = () => {
     userNickname: "",
     password: "",
   });
+  const [error, setError] = useState({});
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { value, name } = e.target;
     setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
+    setError((error) => ({ ...error, [name]: "" })); // 필드 수정 시 해당 필드의 에러 메시지 초기화
+
+    if (name === "email" && value) {
+      try {
+        await axios.post("http://localhost:8001/auth/check-email", {
+          email: value,
+        });
+        setError((error) => ({ ...error, email: "" }));
+      } catch (err) {
+        if (err.response && err.response.data) {
+          setError((error) => ({ ...error, email: err.response.data.message }));
+        }
+      }
+    }
+
+    if (name === "userNickname" && value) {
+      try {
+        await axios.post("http://localhost:8001/auth/check-nickname", {
+          userNickname: value,
+        });
+        setError((error) => ({ ...error, userNickname: "" }));
+      } catch (err) {
+        if (err.response && err.response.data) {
+          setError((error) => ({
+            ...error,
+            userNickname: err.response.data.message,
+          }));
+        }
+      }
+    }
   };
 
   const register = async (e) => {
     e.preventDefault();
-    // setError({ email: "", userName: "", userNickname: "", password: "" }); // reset errors
-    // const addMember = {
-    //   email: userInfo.email,
-    //   userName: userInfo.userName,
-    //   userNickname: userInfo.userNickname,
-    //   password: userInfo.password,
-    // };
-    axios
-      .post("http://localhost:8001/auth/join", {
-        email: userInfo.email,
-        userName: userInfo.userName,
-        userNickname: userInfo.userNickname,
-        password: userInfo.password,
-      })
-      .then((res) => {
-        console.log("회원가입중", res);
-        if (res.data.affectedRows === 1) {
-          alert("회원가입이 성공했습니다.");
-        } else {
-          alert("회원가입에 실패했습니다.");
-        }
-      })
-      .catch((err) => console.log(err));
+    const newErrors = {};
+
+    if (!userInfo.email) {
+      newErrors.email = "이메일을 입력해 주세요.";
+    }
+    if (!userInfo.userName) {
+      newErrors.userName = "성명을 입력해 주세요.";
+    }
+    if (!userInfo.userNickname) {
+      newErrors.userNickname = "닉네임을 입력해 주세요.";
+    }
+    if (!userInfo.password) {
+      newErrors.password = "비밀번호를 입력해 주세요.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setError(newErrors);
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:8001/auth/join", userInfo);
+      if (res.data.affectedRows === 1) {
+        alert("회원가입이 성공했습니다.");
+      } else {
+        alert("회원가입에 실패했습니다.");
+      }
+    } catch (err) {
+      if (err.response && err.response.data) {
+        const { field, message } = err.response.data;
+        setError((error) => ({ ...error, [field]: message }));
+      } else {
+        console.error(err);
+      }
+    }
   };
 
   return (
@@ -130,7 +178,7 @@ const JoinSection = () => {
                   placeholder="Email"
                   required
                 />
-                {/* {error.email && <p className="error">{error.email}</p>} */}
+                {error.email && <p className="error">{error.email}</p>}
               </td>
             </tr>
             <tr>
@@ -148,7 +196,7 @@ const JoinSection = () => {
                   placeholder="Username"
                   required
                 />
-                {/* {error.userName && <p className="error">{error.userName}</p>} */}
+                {error.userName && <p className="error">{error.userName}</p>}
               </td>
             </tr>
             <tr>
@@ -161,12 +209,12 @@ const JoinSection = () => {
                   ref={userNicknameRef}
                   value={userInfo.userNickname}
                   onChange={handleChange}
-                  placeholder="Usernickame"
+                  placeholder="Usernickname"
                   required
                 />
-                {/* {error.userNickname && (
+                {error.userNickname && (
                   <p className="error">{error.userNickname}</p>
-                )} */}
+                )}
               </td>
             </tr>
             <tr>
@@ -175,6 +223,7 @@ const JoinSection = () => {
               </td>
               <td>
                 <input
+                  type="password" // password type 수정
                   name="password"
                   id="password"
                   ref={passwordRef}
@@ -183,7 +232,7 @@ const JoinSection = () => {
                   placeholder="Password"
                   required
                 />
-                {/* {error.password && <p className="error">{error.password}</p>} */}
+                {error.password && <p className="error">{error.password}</p>}
               </td>
             </tr>
           </tbody>
