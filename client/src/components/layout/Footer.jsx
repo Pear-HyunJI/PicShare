@@ -4,8 +4,34 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "@/store/member";
+import { FaUserCheck, FaUserTimes } from "react-icons/fa";
+import { CiCirclePlus } from "react-icons/ci";
 
-const FooterBlock = styled.div``;
+const FooterBlock = styled.div`
+  padding: 15px;
+  .menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const Loginout = styled.div`
+  font-size: 30px;
+  margin-left: 20px;
+`;
+
+const Upload = styled.div`
+  font-size: 30px;
+  margin-left: 20px;
+`;
+
+const Profile = styled.div`
+  font-size: 30px;
+  margin-left: 20px;
+`;
+
+
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -21,23 +47,18 @@ const Footer = () => {
   return (
     <FooterBlock>
       {user ? (
-        <div>
-          <h2>푸터</h2>
-          <p>로그인 됐음</p>
-          <Link to="/personalpage">
-            유저 개인 페이지로 이동({user.userNickname})
-          </Link>
-          <br />
-          <Link to="/feedinsert">피드등록 +</Link>
-          <br />
-          <a href="#" onClick={handleLogout}>
-            로그아웃
-          </a>
+        <div className="menu">
+          {/* <h2>푸터</h2> */}
+          <Loginout><a href="#" onClick={handleLogout}><FaUserCheck /></a></Loginout>
+          <Upload><Link to="/feedinsert"><CiCirclePlus /></Link></Upload>
+          <Profile><Link to="/personalpage">프로필({user.userNickname})</Link></Profile>
+          
         </div>
+        
       ) : (
         <div>
-          <h2>푸터</h2>
-          <p>로그인안되어있음</p>
+          {/* <h2>푸터</h2> */}
+          <Logout><FaUserTimes /></Logout>
         </div>
       )}
     </FooterBlock>
