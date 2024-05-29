@@ -7,6 +7,7 @@ import { useMediaQuery } from "react-responsive";
 import logo from "@/assets/images/PicShare.png";
 import screenShot from "@/assets/images/screenShot.png";
 import screenShot2 from "@/assets/images/screenShot2.png";
+import { useSelector } from "react-redux";
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -15,12 +16,13 @@ const LayoutWrapper = styled.div`
   justify-content: space-evenly;
   background-color: #f2f2f2;
   .screenShotWrapper {
-    display: flex; 
-    width: 100%; 
+    display: flex;
+    width: 100%;
     justify-content: space-evenly;
   }
-  .screenShot, .screenShot2 {
-    width: 45%; 
+  .screenShot,
+  .screenShot2 {
+    width: 45%;
   }
 
   @media (max-width: 1200px) {
@@ -71,6 +73,7 @@ const MainContent = styled.main`
 
 const Layout = () => {
   const mobile = useMediaQuery({ maxWidth: 1200 });
+  const user = useSelector((state) => state.members.user);
   return (
     <LayoutWrapper>
       {!mobile && (
@@ -80,17 +83,17 @@ const Layout = () => {
             사진으로 연결되는 세상, <br /> PicShare와 함께.
           </p>
           <div className="screenShotWrapper">
-            <img src={screenShot} alt="스크린샷" className="screenShot"/>
-            <img src={screenShot2} alt="스크린샷2" className="screenShot2"/>
+            <img src={screenShot} alt="스크린샷" className="screenShot" />
+            <img src={screenShot2} alt="스크린샷2" className="screenShot2" />
           </div>
         </LeftLayoutBlock>
       )}
       <RightLayoutBlock>
-        <Header />
+        {user && <Header />}
         <MainContent>
           <Outlet />
         </MainContent>
-        <Footer />
+        {user && <Footer />}
       </RightLayoutBlock>
     </LayoutWrapper>
   );
