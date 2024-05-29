@@ -6,6 +6,7 @@ import JoinView from "@/views/JoinView";
 import LoginView from "@/views/LoginView";
 import PersonalPageView from "@/views/PersonalPageView";
 import ProfileModifyView from "@/views/ProfileModifyView";
+import FeedInsertView from "@/views/FeedInsertView";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/feed" element={<MainFeedView />} />
         <Route path="/personalpage" element={<PersonalPageView />} />
         <Route path="/profilemodify" element={<ProfileModifyView />} />
+        <Route path="/feedinsert" element={<FeedInsertView />} />
       </Route>
     </Routes>
   );

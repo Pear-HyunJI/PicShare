@@ -27,6 +27,9 @@ const Footer = () => {
           <Link to="/personalpage">
             유저 개인 페이지로 이동({user.userNickname})
           </Link>
+          <br />
+          <Link to="/feedinsert">피드등록 +</Link>
+          <br />
           <a href="#" onClick={handleLogout}>
             로그아웃
           </a>
