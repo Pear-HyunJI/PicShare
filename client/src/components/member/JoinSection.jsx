@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import logo from "../../assets/images/PicShare.png";
@@ -60,6 +60,11 @@ const JoinSectionBlock = styled.div`
     font-size: 0.875rem;
     margin-top: 5px;
   }
+  .success {
+    color: green;
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
 `;
 
 const JoinSection = () => {
@@ -74,18 +79,23 @@ const JoinSection = () => {
     password: "",
   });
   const [error, setError] = useState({});
+  const [success, setSuccess] = useState({});
 
   const handleChange = async (e) => {
     const { value, name } = e.target;
     setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
     setError((error) => ({ ...error, [name]: "" })); // 필드 수정 시 해당 필드의 에러 메시지 초기화
+    setSuccess((success) => ({ ...success, [name]: "" })); // 성공 메시지 초기화
 
     if (name === "email" && value) {
       try {
         await axios.post("http://localhost:8001/auth/check-email", {
           email: value,
         });
-        setError((error) => ({ ...error, email: "" }));
+        setSuccess((success) => ({
+          ...success,
+          email: "사용 가능한 이메일입니다.",
+        }));
       } catch (err) {
         if (err.response && err.response.data) {
           setError((error) => ({ ...error, email: err.response.data.message }));
@@ -98,7 +108,10 @@ const JoinSection = () => {
         await axios.post("http://localhost:8001/auth/check-nickname", {
           userNickname: value,
         });
-        setError((error) => ({ ...error, userNickname: "" }));
+        setSuccess((success) => ({
+          ...success,
+          userNickname: "사용 가능한 닉네임입니다.",
+        }));
       } catch (err) {
         if (err.response && err.response.data) {
           setError((error) => ({
@@ -179,6 +192,7 @@ const JoinSection = () => {
                   required
                 />
                 {error.email && <p className="error">{error.email}</p>}
+                {success.email && <p className="success">{success.email}</p>}
               </td>
             </tr>
             <tr>
@@ -215,6 +229,9 @@ const JoinSection = () => {
                 {error.userNickname && (
                   <p className="error">{error.userNickname}</p>
                 )}
+                {success.userNickname && (
+                  <p className="success">{success.userNickname}</p>
+                )}
               </td>
             </tr>
             <tr>
@@ -223,7 +240,7 @@ const JoinSection = () => {
               </td>
               <td>
                 <input
-                  type="password" // password type 수정
+                  type="password"
                   name="password"
                   id="password"
                   ref={passwordRef}
