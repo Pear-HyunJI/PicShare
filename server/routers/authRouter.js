@@ -75,7 +75,7 @@ authRouter.post("/join", (req, res) => {
   );
 });
 
-// 로그인 기능
+// LOGIN 기능
 authRouter.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -114,6 +114,18 @@ authRouter.post("/login", (req, res) => {
       }
     }
   );
+});
+
+// LOGOUT 기능
+authRouter.post("/remove", (req, res) => {
+  const userNo = req.body.userNo;
+  db.query("DELETE FROM membertbl WHERE userNo=?", [userNo], (err, result) => {
+    if (err) {
+      throw err;
+    } else {
+      res.send(result);
+    }
+  });
 });
 
 export default authRouter;
