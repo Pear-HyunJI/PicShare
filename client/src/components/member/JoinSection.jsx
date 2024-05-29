@@ -148,7 +148,7 @@ const JoinSection = () => {
       setError(newErrors);
       return;
     }
-
+    
     try {
       const res = await axios.post("http://localhost:8001/auth/join", userInfo);
       if (res.data.affectedRows === 1) {
@@ -156,6 +156,7 @@ const JoinSection = () => {
       } else {
         alert("회원가입에 실패했습니다.");
       }
+      // console.log(response)
       navigate("/login");
     } catch (err) {
       if (err.response && err.response.data) {

@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/PicShare.png";
+import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
+import { AiFillMessage } from "react-icons/ai";
 
 const HeaderBlock = styled.div`
   display: flex;
@@ -13,13 +15,26 @@ const HeaderBlock = styled.div`
   .menu {
     display: flex;
     justify-content: space- between;
-
     align-items: center;
-    p {
-      padding-left: 20px;
-    }
+    
   }
 `;
+
+const Search = styled.div`
+  font-size: 30px;
+`;
+
+const Like = styled.div`
+  font-size: 30px;
+  color: red;
+  margin-left: 10px;
+`;
+
+const Dm = styled.div`
+  font-size: 30px;
+  margin-left: 10px;
+`;
+
 
 const Header = () => {
   return (
@@ -28,8 +43,17 @@ const Header = () => {
         <img src={logo} alt="로고" />
       </div>
       <div className="menu">
-        <p>좋아요한 피드목록</p>
-        <p>다이렉트 메세지</p>
+      <Search>
+        <Link to="/"><FaSearch /></Link>
+        </Search>
+        <Like>
+          <Link to="/"><FaHeart/></Link>
+          {/* <FaRegHeart/> */}
+        </Like>
+        <Dm>
+        <Link to="/"><AiFillMessage /></Link>
+        </Dm>
+        
       </div>
     </HeaderBlock>
   );
