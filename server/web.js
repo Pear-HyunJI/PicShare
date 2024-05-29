@@ -13,11 +13,13 @@ const corsOptions = {
   origin: "http://localhost:5173",
   credentials: true,
 };
+
 app.use(cors(corsOptions));
 
 app.use(express.json()); // 사용자의 json 요청을 처리하여 req.body 객체에 저장해줌
 
 import authRouter from "./routers/authRouter.js";
+import feedRouter from "./routers/feedRouter.js";
 
 // 리소스 파일들을 관리하는 경로 지정하기
 const __dirname = path.resolve();
@@ -25,6 +27,7 @@ const __dirname = path.resolve();
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/auth", authRouter);
+app.use("/feed", feedRouter);
 
 // 지정한 포트에서 서버를 실행함
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

@@ -101,16 +101,16 @@ authRouter.post("/login", (req, res) => {
             .json({ message: "비밀번호가 일치하지 않습니다." });
         }
 
-        // res.json({
-        //   userNo: user.userNo,
-        //   email: user.email,
-        //   password: user.password,
-        //   userName: user.userName,
-        //   userNickname: user.userNickname,
-        //   profilePicture: user.profilePicture,
-        //   created_at: user.created_at,
-        // });
-        res.send(results);
+        res.json({
+          userNo: user.userNo,
+          email: user.email,
+          password: user.password,
+          userName: user.userName,
+          userNickname: user.userNickname,
+          profilePicture: user.profilePicture,
+          created_at: user.created_at,
+        });
+        // res.send(results); // 이렇게 하면 유저가 undifined로 뜸 왜지???
       }
     }
   );
