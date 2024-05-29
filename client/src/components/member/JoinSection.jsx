@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/images/PicShare.png";
 
 const JoinSectionBlock = styled.div`
@@ -68,6 +69,8 @@ const JoinSectionBlock = styled.div`
 `;
 
 const JoinSection = () => {
+  const navigate = useNavigate();
+
   const emailRef = useRef();
   const userNameRef = useRef();
   const userNicknameRef = useRef();
@@ -152,6 +155,7 @@ const JoinSection = () => {
       } else {
         alert("회원가입에 실패했습니다.");
       }
+      navigate("/login");
     } catch (err) {
       if (err.response && err.response.data) {
         const { field, message } = err.response.data;
