@@ -75,4 +75,45 @@ authRouter.post("/join", (req, res) => {
   );
 });
 
+// 로그인 기능
+authRouter.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  db.query(
+    `SELECT * FROM users WHERE email = ? AND password = ?`,
+    [email, password],
+    (err, results) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "서버 오류가 발생했습니다. 다시 시도해주세요." });
+      } else {
+        if (results.length === 0) {
+          return res
+            .status(400)
+            .json({ message: "존재하지 않는 이메일입니다." });
+        }
+
+        const user = results[0];
+        if (password !== user.password) {
+          return res
+            .status(400)
+            .json({ message: "비밀번호가 일치하지 않습니다." });
+        }
+
+        // res.json({
+        //   userNo: user.userNo,
+        //   email: user.email,
+        //   password: user.password,
+        //   userName: user.userName,
+        //   userNickname: user.userNickname,
+        //   profilePicture: user.profilePicture,
+        //   created_at: user.created_at,
+        // });
+        res.send(results);
+      }
+    }
+  );
+});
+
 export default authRouter;
