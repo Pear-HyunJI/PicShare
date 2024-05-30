@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { IoIosArrowBack } from "react-icons/io";
 
 const FeedInsertSectionBlock = styled.form`
   max-width: 600px;
   margin: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 30px;
 
   input,
   textarea,
@@ -19,9 +20,40 @@ const FeedInsertSectionBlock = styled.form`
     border-radius: 5px;
   }
 
+  button {
+    background: #ccc;
+    color: #fff;
+    border-radius: 10px;
+    &:hover {
+      background: gray;
+    }
+  }
+
   textarea {
     resize: none;
     height: 150px;
+  }
+
+  .top {
+    margin: 10px 0;
+    display: flex;
+    // justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 30px;
+    color: #0d0d0d;
+    h2 {
+      flex: 0 0 80%;
+      text-align: center;
+      align-items: center;
+    }
+    button {
+      background: none;
+      border: none;
+      color: black;
+      font-size: 30px;
+      font-weight: bold;
+    }
   }
 
   .image-upload-section {
@@ -29,9 +61,7 @@ const FeedInsertSectionBlock = styled.form`
     gap: 10px;
 
     .images {
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 300px;
+      width: 380px;
       height: 100px;
       display: flex;
       justify-content: center;
@@ -41,10 +71,11 @@ const FeedInsertSectionBlock = styled.form`
         width: 100px;
         height: 100px;
         object-fit: cover;
+        padding: 4px;
       }
 
       span {
-        font-size: 12px;
+        font-size: 20px;
         color: #aaa;
       }
     }
@@ -57,12 +88,16 @@ const FeedInsertSectionBlock = styled.form`
   .hashtags {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     gap: 5px;
-
+    margin: 20px 0;
+    font-size: 20px;
+    font-weight: bold;
     .hashtag {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 10px;
 
       input {
         width: 200px;
@@ -72,15 +107,29 @@ const FeedInsertSectionBlock = styled.form`
         background-color: #ccc;
         border: none;
         cursor: pointer;
-        padding: 5px 10px;
+        padding: 10px 13px;
       }
     }
   }
 
   .scheduled-section {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
+    margin: 20px 0;
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      input[type="checkbox"] {
+        display: none;
+      }
+    }
+
+    .datetime-input {
+      width: 100%;
+    }
   }
 `;
 
@@ -106,6 +155,12 @@ const FeedInsertSection = () => {
 
   const handleAddHashtag = () => {
     setHashtags([...hashtags, ""]);
+  };
+
+  const handleRemoveHashtag = (index) => {
+    const newHashtags = [...hashtags];
+    newHashtags.splice(index, 1);
+    setHashtags(newHashtags);
   };
 
   const handleSave = async (isImmediate) => {
@@ -143,77 +198,112 @@ const FeedInsertSection = () => {
   };
 
   return (
-    <FeedInsertSectionBlock
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSave(!isScheduled); // Immediate post if not scheduled
-      }}
-    >
-      <p>{user.userNo}</p>
-      <div className="image-upload-section">
-        <div className="images">
+    <div>
+      <FeedInsertSectionBlock
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (images.length > 0) {
+            handleSave(!isScheduled); // 예약되지 않은 경우 바로 포스트함
+          } else {
+            alert("이미지를 하나 이상 업로드해주세요.");
+          }
+        }}
+      >
+        <div className="top">
+          <button onClick={handleBack}>
+            <IoIosArrowBack />
+          </button>
+          <h2>새 게시물</h2>
+        </div>
+        <div className="image-upload-section">
           {images.length > 0 ? (
-            images.map((file, idx) => (
-              <img
-                key={idx}
-                src={URL.createObjectURL(file)}
-                alt="upload preview"
-              />
-            ))
+            <div className="images">
+              {images.slice(0, 3).map((file, idx) => (
+                <img
+                  key={idx}
+                  src={URL.createObjectURL(file)}
+                  alt="upload preview"
+                />
+              ))}
+              {images.length > 3 && <span>+{images.length - 3} more</span>}
+            </div>
           ) : (
-            <span>Photo</span>
+            <div
+              className="images"
+              style={{ border: "1px solid #ccc", borderRadius: "5px" }}
+            >
+              <p>photo</p>
+            </div>
+          )}
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
+        </div>
+        <textarea
+          placeholder="피드 내용을 입력하세요..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+        <div className="hashtags">
+          {hashtags.map((hashtag, idx) => (
+            <div className="hashtag" key={idx}>
+              <span>#</span>
+              <input
+                type="text"
+                placeholder={`${idx + 1}번째 해시태그를 입력하세요`}
+                value={hashtag}
+                onChange={(e) => handleHashtagChange(idx, e.target.value)}
+              />
+              {idx === hashtags.length - 1 && (
+                <>
+                  <button type="button" onClick={handleAddHashtag}>
+                    +
+                  </button>
+                  {hashtags.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveHashtag(idx)}
+                    >
+                      -
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="scheduled-section">
+          <div className="checkbox-label">
+            <p>지정된 시간에 게시물을 자동으로 올리시겠습니까?</p>
+            <label>
+              <input
+                type="checkbox"
+                checked={isScheduled}
+                onChange={() => setIsScheduled(!isScheduled)}
+              />
+              <span style={{ color: "#09fc52", fontWeight: "bold" }}>
+                포스팅 예약하기
+              </span>
+            </label>
+          </div>
+          {isScheduled && (
+            <input
+              className="datetime-input"
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+            />
           )}
         </div>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
-      </div>
-      <textarea
-        placeholder="피드 내용을 입력하세요..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      <div className="hashtags">
-        {hashtags.map((hashtag, idx) => (
-          <div className="hashtag" key={idx}>
-            <span>#</span>
-            <input
-              type="text"
-              placeholder={`${idx + 1}번째 해시태그를 입력하세요`}
-              value={hashtag}
-              onChange={(e) => handleHashtagChange(idx, e.target.value)}
-            />
-          </div>
-        ))}
-        <button type="button" onClick={handleAddHashtag}>
-          +
-        </button>
-      </div>
-      <div className="scheduled-section">
-        <label>
-          <input
-            type="checkbox"
-            checked={isScheduled}
-            onChange={() => setIsScheduled(!isScheduled)}
-          />
-          예약포스팅
-        </label>
-        {isScheduled && (
-          <input
-            type="datetime-local"
-            value={scheduledAt}
-            onChange={(e) => setScheduledAt(e.target.value)}
-          />
-        )}
-      </div>
-      <button type="submit">포스팅</button>
-      <button type="button" onClick={handleBack}>
-        뒤로가기
-      </button>
-    </FeedInsertSectionBlock>
+        <button type="submit">포스팅</button>
+        {/* <button type="button" onClick={handleBack}>
+          뒤로가기
+        </button> */}
+      </FeedInsertSectionBlock>
+    </div>
   );
 };
 
