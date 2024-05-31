@@ -7,6 +7,7 @@ import LoginView from "@/views/LoginView";
 import PersonalPageView from "@/views/PersonalPageView";
 import ProfileModifyView from "@/views/ProfileModifyView";
 import FeedInsertView from "@/views/FeedInsertView";
+import UserSearchView from "@/views/UserSearchView";
 
 const App = () => {
   return (
@@ -16,9 +17,10 @@ const App = () => {
         <Route path="/join" element={<JoinView />} />
         <Route path="/login" element={<LoginView />} />
         <Route path="/feed" element={<MainFeedView />} />
-        <Route path="/personalpage" element={<PersonalPageView />} />
+        <Route path="/personalpage/:userNo" element={<PersonalPageView />} />
         <Route path="/profilemodify" element={<ProfileModifyView />} />
         <Route path="/feedinsert" element={<FeedInsertView />} />
+        <Route path="/usersearch" element={<UserSearchView />} />
       </Route>
     </Routes>
   );

@@ -45,24 +45,30 @@ const Dm = styled.div`
   margin-left: 10px;
 `;
 
-
 const Header = () => {
   return (
     <HeaderBlock>
-      <div className="logo">
+      <Link to="/feed" className="logo">
         <img src={logo} alt="로고" />
-      </div>
+      </Link>
       <div className="menu">
-      <Search>
-        <FaSearch /><input type="text" placeholder="검색어를 입력하세요."/>
-        {/* 나중에 검색기능 도입 */}
-      </Search>
+        <Search>
+          <Link to="/usersearch">
+            <FaSearch />
+          </Link>
+          <input type="text" placeholder="검색어를 입력하세요." />
+          {/* 나중에 검색기능 도입 */}
+        </Search>
         <Like>
-          <Link to="/"><FaHeart/></Link>
+          <Link to="/">
+            <FaHeart />
+          </Link>
           {/* <FaRegHeart/> */}
         </Like>
         <Dm>
-        <Link to="/"><AiFillMessage /></Link>
+          <Link to="/">
+            <AiFillMessage />
+          </Link>
         </Dm>
       </div>
     </HeaderBlock>
