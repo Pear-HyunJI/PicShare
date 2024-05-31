@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import profileIMG from "@/assets/images/profileIMG.jpg";
+// import profileIMG from "@/assets/images/profileIMG.jpg";
 import { FaPen } from "react-icons/fa";
 import axios from "axios";
 import FollowButton from "../follow/FollowButton";
@@ -24,7 +24,7 @@ margin: 100px;
 `;
 
 
-const ProfileSection = () => {
+const ProfileSection = ({ photoValue }) => {
   const currentUserId = 1; // 로그인된 사용자 ID
   const targetUserId = 2; // 팔로우할 대상 사용자 ID
 
@@ -50,7 +50,7 @@ const ProfileSection = () => {
   return (
     <ProfileSectionBlock>
       <div className="profile">
-      <img src={profileIMG} alt="프로필사진" />
+      {photoValue && <img src={`http://localhost:8001/userprofile/${photoValue}`} alt="프로필사진" />}
       <p>게시물</p>
       <p>팔로워</p>
       <p>팔로잉</p>

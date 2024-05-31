@@ -3,7 +3,7 @@ import { db } from "../db.js";
 
 const followersRouter = express.Router();
 
-app.get('/followers/:userId', (req, res) => {
+followersRouter.get('/followers/:userId', (req, res) => {
     const { userId } = req.params;
     const query = `
       SELECT users.id, users.username 
@@ -17,7 +17,7 @@ app.get('/followers/:userId', (req, res) => {
     });
   });
   
-  app.post('/follow', (req, res) => {
+  followersRouter.post('/follow', (req, res) => {
     const { userId, followerId } = req.body;
     const query = 'INSERT INTO followers (user_id, follower_id) VALUES (?, ?)';
     db.query(query, [userId, followerId], (err, results) => {
@@ -26,8 +26,6 @@ app.get('/followers/:userId', (req, res) => {
     });
   });
   
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+
 
 export default followersRouter;
