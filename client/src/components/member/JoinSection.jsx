@@ -81,10 +81,17 @@ const JoinSection = () => {
     userName: "",
     userNickname: "",
     password: "",
+    photo:"",
   });
   const [error, setError] = useState({});
   const [success, setSuccess] = useState({});
+  const [setPhotoValue] = useState("")
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setUserInfo((prevUserInfo) => ({...prevUserInfo, photo: file }));
+    // setPhotoValue(e.target.value)
+};
   const handleChange = async (e) => {
     const { value, name } = e.target;
     setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
@@ -129,35 +136,25 @@ const JoinSection = () => {
 
   const register = async (e) => {
     e.preventDefault();
-    const newErrors = {};
-
-    if (!userInfo.email) {
-      newErrors.email = "이메일을 입력해 주세요.";
-    }
-    if (!userInfo.userName) {
-      newErrors.userName = "성명을 입력해 주세요.";
-    }
-    if (!userInfo.userNickname) {
-      newErrors.userNickname = "닉네임을 입력해 주세요.";
-    }
-    if (!userInfo.password) {
-      newErrors.password = "비밀번호를 입력해 주세요.";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setError(newErrors);
-      return;
-    }
-    
+    const formData = new FormData();
+    formData.append("email", userInfo.email);
+    formData.append("userName", userInfo.userName);
+    formData.append("userNickname", userInfo.userNickname);
+    formData.append("password", userInfo.password);
+    formData.append("photo", userInfo.photo); // 프로필 사진 추가
+  
     try {
-      const res = await axios.post("http://localhost:8001/auth/join", userInfo);
+      const res = await axios.post("http://localhost:8001/auth/join", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // 파일 업로드를 위한 헤더 설정
+        },
+      });
       if (res.data.affectedRows === 1) {
         alert("회원가입이 성공했습니다.");
+        navigate("/login");
       } else {
         alert("회원가입에 실패했습니다.");
       }
-      // console.log(response)
-      navigate("/login");
     } catch (err) {
       if (err.response && err.response.data) {
         const { field, message } = err.response.data;
@@ -245,6 +242,21 @@ const JoinSection = () => {
                   required
                 />
                 {error.password && <p className="error">{error.password}</p>}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  type="file"
+                  name="photo"
+                  id="photo"
+                  // ref={passwordRef}
+                  // value={userInfo.password}
+                  onChange={handleFileChange}
+                  placeholder="profileImg"
+                  required
+                />
+                {error.photo && <p className="error">{error.photo}</p>}
               </td>
             </tr>
           </tbody>

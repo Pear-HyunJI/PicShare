@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "@/store/member";
 import { FaUserCheck, FaUserTimes } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
-import profileIMG from "@/assets/images/profileIMG.jpg";
+
 
 const FooterBlock = styled.div`
   padding: 15px;
@@ -58,8 +58,7 @@ const Footer = () => {
           {/* <h2>푸터</h2> */}
           <Loginout><a href="#" onClick={handleLogout}><FaUserCheck /></a></Loginout>
           <Upload><Link to="/feedinsert"><FaCirclePlus /></Link></Upload>
-          <Profile><Link to="/personalpage"><img src={profileIMG} alt="프로필사진" />({user.userNickname})</Link></Profile>
-          
+          <Profile><Link to="/personalpage"><img src= {user.photo} alt="프로필사진" />({user.userNickname})</Link></Profile>
         </div>
         
       ) : (

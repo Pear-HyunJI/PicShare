@@ -1,7 +1,19 @@
 import express from "express";
 import { db } from "../db.js";
+import multer from "multer" 
 
 const authRouter = express.Router();
+
+// Multer 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, "uploads/"); // 파일이 저장될 폴더 경로
+  },
+  filename: (req, file, cb) => {
+      cb(null, Date.now() + "-" + file.originalname); // 파일명 설정
+  },
+});
+const upload = multer({ storage: storage });
 
 // 이메일 중복 체크
 authRouter.post("/check-email", (req, res) => {
@@ -51,12 +63,12 @@ authRouter.post("/check-nickname", (req, res) => {
 });
 
 // JOIN 기능
-authRouter.post("/join", (req, res) => {
+authRouter.post("/join", upload.single("photo"),(req, res) => {
   const { email, userName, userNickname, password } = req.body;
-
+  const photo = req.file
   db.query(
-    `INSERT INTO users (email, userName, userNickname, password) VALUES (?, ?, ?, ?)`,
-    [email, userName, userNickname, password],
+    `INSERT INTO users (email, userName, userNickname, password, photo) VALUES (?, ?, ?, ?, ?)`,
+    [email, userName, userNickname, password, photo.filename],
     (err, result) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {
@@ -127,5 +139,23 @@ authRouter.post("/remove", (req, res) => {
     }
   });
 });
+
+//프로필사진수정기능
+// productRouter.post("/modify", upload.single("photo"), (req, res)=>{
+//   const {prNo, category, name, price, description, inventory} = req.body
+//   const photo = req.file
+//   const query = `UPDATE producttbl 
+//                  SET category=?, name=?, price=?, description=?, inventory=?, photo=? 
+//                  WHERE prNo=?`
+//   const queryparam = [category, name, price, description, inventory, photo.filename, prNo]
+//   db.query(query, queryparam, (err, result)=>{
+//       if (err) {
+//           res.status(500).send("상품정보 수정 실패");
+//           throw err
+//       } else {
+//           res.send(result)
+//       }
+//   })
+// });
 
 export default authRouter;

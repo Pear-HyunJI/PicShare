@@ -20,7 +20,8 @@ app.use(express.json()); // 사용자의 json 요청을 처리하여 req.body �
 
 import authRouter from "./routers/authRouter.js";
 import feedRouter from "./routers/feedRouter.js";
-import follwersRouter from "./routers/follwersRouter.js";
+import followersRouter from "./routers/followersRouter.js";
+import userprofileRouter from "./routers/userprofileRouter.js";
 
 // 리소스 파일들을 관리하는 경로 지정하기
 const __dirname = path.resolve();
@@ -29,7 +30,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/auth", authRouter);
 app.use("/feed", feedRouter);
-app.use("/follow", follwersRouter);
+app.use("/follow", followersRouter);
+app.use('/users', userprofileRouter);
 
 
 // 지정한 포트에서 서버를 실행함
