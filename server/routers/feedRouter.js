@@ -42,8 +42,8 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
 
       // images 테이블에 이미지 저장
       const imageInsert = files.map((file) => {
-        const imageUrl = `/uploads/${file.filename}`;
-        return (imageres, imagedata) => {
+        const imageUrl = `http://localhost:8001/uploads/${file.filename}`;
+        return new Promise((imageres, imagedata) => {
           db.query(
             `INSERT INTO images (postId, imageUrl) VALUES (?, ?)`,
             [postId, imageUrl],
@@ -55,7 +55,7 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
               imageres(result);
             }
           );
-        };
+        });
       });
 
       // 해시태그 저장
@@ -134,34 +134,81 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
 });
 
 // 모든 유저의 포스트 가져옴
-// feedRouter.get("/all", (req, res) => {
-//   try {
-//     const posts = db.query(`SELECT p.*, u.userNickname, u.photo
-//       FROM posts p
-//       JOIN users u ON p.userNo = u.userNo
-//       ORDER BY p.created_at DESC`);
+feedRouter.get("/all", (req, res) => {
+  db.query(
+    `SELECT p.*, u.userNickname, u.profilePicture 
+      FROM posts p 
+      JOIN users u ON p.userNo = u.userNo 
+      ORDER BY p.created_at DESC`,
+    (err, posts) => {
+      if (err) {
+        console.log(err);
+        return res.json({
+          message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+        });
+      }
 
-//     for (let post of posts) {
-//       const images = db.query("SELECT * FROM images WHERE postId = ?", [
-//         post.postId,
-//       ]);
-//       post.images = images;
+      const postIds = posts.map((post) => post.postId);
 
-//       const hashtags = db.query(
-//         `SELECT h.tag
-//         FROM post_hashtags ph
-//         JOIN hashtags h ON ph.hashtagId = h.hashtagId
-//         WHERE ph.postId = ?`,
-//         [post.postId]
-//       );
-//       post.hashtags = hashtags.map((ht) => ht.tag);
-//     }
+      // 피드 이미지 가져옴
+      db.query(
+        ` SELECT i.* FROM images i WHERE i.postId IN (?) `,
+        [postIds],
+        (err, imagesdata) => {
+          if (err) {
+            console.log(err);
+            return res.json({
+              message: "피드의 이미지를 가져오던 중 오류가 발생했습니다.",
+            });
+          }
 
-//     res.send(posts);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "서버 오류가 발생했습니다." }); // 에러 처리 추가
-//   }
-// });
+          // 해시태그 가져옴
+          db.query(
+            `
+            SELECT ph.postId, h.tag
+            FROM post_hashtags ph
+            JOIN hashtags h ON ph.hashtagId = h.hashtagId
+            WHERE ph.postId IN (?)
+            `,
+            [postIds],
+            (err, hashtagsdata) => {
+              if (err) {
+                console.log(err);
+                return res.json({
+                  message:
+                    "피드의 해시태그를 가져오던 중 오류가 발생했슴니다람쥐",
+                });
+              }
+
+              // 이미지를 포스트에 매핑
+              const imagesByPostId = imagesdata.reduce((acc, image) => {
+                if (!acc[image.postId]) acc[image.postId] = [];
+                acc[image.postId].push(image);
+                return acc;
+              }, {});
+
+              // 해시태그를 포스트에 매핑
+              const hashtagsByPostId = hashtagsdata.reduce((acc, hashtag) => {
+                if (!acc[hashtag.postId]) acc[hashtag.postId] = [];
+                acc[hashtag.postId].push(hashtag.tag);
+                return acc;
+              }, {});
+
+              // 결과를 최종 포스트 데이터에 합침
+              const result = posts.map((post) => ({
+                ...post,
+                feedImages: imagesByPostId[post.postId] || [],
+                feedHashtags: hashtagsByPostId[post.postId] || [],
+              }));
+
+              console.log("서버에서 보내주는 올피드데이터", result);
+              res.send(result);
+            }
+          );
+        }
+      );
+    }
+  );
+});
 
 export default feedRouter;

@@ -176,4 +176,16 @@ authRouter.get("/users", (req, res) => {
   );
 });
 
+// 로그인 유지
+authRouter.post("/refresh", (req, res) => {
+  const userNo = req.body.userNo;
+  db.query("SELECT * FROM users WHERE userNo=?", [userNo], (err, result) => {
+    if (err) {
+      throw err;
+    } else {
+      res.send({ user: result[0] });
+    }
+  });
+});
+
 export default authRouter;

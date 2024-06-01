@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Outlet } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -7,7 +7,9 @@ import { useMediaQuery } from "react-responsive";
 import logo from "@/assets/images/PicShare.png";
 import screenShot from "@/assets/images/screenShot.png";
 import screenShot2 from "@/assets/images/screenShot2.png";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { localUser } from "@/store/member";
+import axios from "axios";
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -73,7 +75,20 @@ const MainContent = styled.main`
 
 const Layout = () => {
   const mobile = useMediaQuery({ maxWidth: 1200 });
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.members.user);
+
+  useEffect(() => {
+    if (localStorage.getItem("loging")) {
+      const { userNo } = JSON.parse(localStorage.getItem("loging"));
+      axios
+        .post("http://localhost:8001/auth/refresh", { userNo })
+        .then((res) => {
+          dispatch(localUser(res.data.user));
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [dispatch, user?.userNo]);
   return (
     <LayoutWrapper>
       {!mobile && (
