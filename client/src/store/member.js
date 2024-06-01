@@ -45,20 +45,7 @@ const memberSlice = createSlice({
 export const { userLogin, userLogout, localUser, initUsers } =
   memberSlice.actions;
 
-// export const fetchUsers = () => {
-//   return (dispatch) => {
-//     axios
-//       .get("http://localhost:8001/auth/users")
-//       .then((res) => {
-//         console.log("유저목록", res);
-//         const data = res.data;
-//         console.log("유저데이터", data);
-//         dispatch(initUsers(data));
-//       })
-//       .catch((err) => console.log(err));
-//   };
-// };
-
+// 모든 유저 정보 요청하기
 export const fetchUsers = () => (dispatch) => {
   axios
     .get("http://localhost:8001/auth/users")

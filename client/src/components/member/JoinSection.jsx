@@ -30,7 +30,22 @@ const JoinSectionBlock = styled.div`
     width: 100%;
     td {
       padding: 10px;
-      text-align: left;
+      text-align: center;
+      img {
+        border-radius: 50%;
+        width: 30%;
+      }
+
+      .checkbox-label {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 13px;
+
+        input[type="checkbox"] {
+          display: none;
+        }
+      }
     }
     input {
       width: 100%;
@@ -81,22 +96,42 @@ const JoinSection = () => {
     userName: "",
     userNickname: "",
     password: "",
-    photo:"",
+    photo: "",
   });
   const [error, setError] = useState({});
   const [success, setSuccess] = useState({});
-  const [setPhotoValue] = useState("")
+  const [useDefaultProfile, setUseDefaultProfile] = useState(true); // 기본은 기본프로필 사용
+  const [profilePreview, setProfilePreview] = useState(
+    "http://localhost:8001/uploads/defaultProfile.jpg"
+  ); // 프로필프리뷰
 
+  // 프로필프리뷰
+  const handleCheckboxChange = () => {
+    setUseDefaultProfile((prevUseDefaultProfile) => {
+      const newUseDefaultProfile = !prevUseDefaultProfile;
+      console.log("체크박스 클릭시", newUseDefaultProfile);
+      setProfilePreview(
+        newUseDefaultProfile
+          ? "http://localhost:8001/uploads/defaultProfile.jpg"
+          : profilePreview
+      );
+      return newUseDefaultProfile;
+    });
+  };
+
+  // 프로필사진 변경
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setUserInfo((prevUserInfo) => ({...prevUserInfo, photo: file }));
-    // setPhotoValue(e.target.value)
-};
+    setUserInfo((prevUserInfo) => ({ ...prevUserInfo, photo: file }));
+    setProfilePreview(URL.createObjectURL(file)); // 사진을 등록하면 프로필프리뷰 변경
+  };
+
+  // 이메일, 닉네임 중복체크
   const handleChange = async (e) => {
     const { value, name } = e.target;
     setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
-    setError((error) => ({ ...error, [name]: "" })); // 필드 수정 시 해당 필드의 에러 메시지 초기화
-    setSuccess((success) => ({ ...success, [name]: "" })); // 성공 메시지 초기화
+    setError((error) => ({ ...error, [name]: "" }));
+    setSuccess((success) => ({ ...success, [name]: "" }));
 
     if (name === "email" && value) {
       try {
@@ -134,6 +169,7 @@ const JoinSection = () => {
     }
   };
 
+  // submit
   const register = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -141,14 +177,22 @@ const JoinSection = () => {
     formData.append("userName", userInfo.userName);
     formData.append("userNickname", userInfo.userNickname);
     formData.append("password", userInfo.password);
-    formData.append("photo", userInfo.photo); // 프로필 사진 추가
-  
+    if (useDefaultProfile || !userInfo.photo) {
+      formData.append("photo", "defaultProfile.jpg");
+    } else {
+      formData.append("photo", userInfo.photo);
+    }
+
     try {
-      const res = await axios.post("http://localhost:8001/auth/join", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // 파일 업로드를 위한 헤더 설정
-        },
-      });
+      const res = await axios.post(
+        "http://localhost:8001/auth/join",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       if (res.data.affectedRows === 1) {
         alert("회원가입이 성공했습니다.");
         navigate("/login");
@@ -178,6 +222,53 @@ const JoinSection = () => {
         </div>
         <table>
           <tbody>
+            <tr>
+              <td>
+                <img src={profilePreview} alt="프로필사진" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div className="checkbox-label">
+                  <p>나만의 프로필사진을 추가할까요?</p>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={!useDefaultProfile} // 이 체크박스가 체크됐다는건 -> 기본프로필을 사용하지 않겠다
+                      onChange={handleCheckboxChange}
+                    />
+                    {useDefaultProfile ? (
+                      <span
+                        style={{
+                          color: "#09fc52",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        사진 추가하기
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: "#09fc52",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        기본 이미지로 변경
+                      </span>
+                    )}
+                  </label>
+                </div>
+                {!useDefaultProfile && (
+                  <input
+                    type="file"
+                    name="photo"
+                    id="photo"
+                    onChange={handleFileChange}
+                    placeholder="Profile Image"
+                  />
+                )}
+              </td>
+            </tr>
             <tr>
               <td>
                 <input
@@ -242,21 +333,6 @@ const JoinSection = () => {
                   required
                 />
                 {error.password && <p className="error">{error.password}</p>}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input
-                  type="file"
-                  name="photo"
-                  id="photo"
-                  // ref={passwordRef}
-                  // value={userInfo.password}
-                  onChange={handleFileChange}
-                  placeholder="profileImg"
-                  required
-                />
-                {error.photo && <p className="error">{error.photo}</p>}
               </td>
             </tr>
           </tbody>

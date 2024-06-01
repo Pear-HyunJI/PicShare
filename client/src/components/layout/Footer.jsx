@@ -65,7 +65,11 @@ const Footer = () => {
           </Upload>
           <Profile>
             <Link to={`/personalpage/${user.userNo}`}>
-              <img src={user.photo} alt="프로필사진" />({user.userNickname})
+              <img
+                src={`http://localhost:8001/uploads/${user.profilePicture}`}
+                alt="프로필사진"
+              />
+              ({user.userNickname})
             </Link>
           </Profile>
         </div>

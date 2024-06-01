@@ -133,4 +133,35 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
   );
 });
 
+// 모든 유저의 포스트 가져옴
+// feedRouter.get("/all", (req, res) => {
+//   try {
+//     const posts = db.query(`SELECT p.*, u.userNickname, u.photo
+//       FROM posts p
+//       JOIN users u ON p.userNo = u.userNo
+//       ORDER BY p.created_at DESC`);
+
+//     for (let post of posts) {
+//       const images = db.query("SELECT * FROM images WHERE postId = ?", [
+//         post.postId,
+//       ]);
+//       post.images = images;
+
+//       const hashtags = db.query(
+//         `SELECT h.tag
+//         FROM post_hashtags ph
+//         JOIN hashtags h ON ph.hashtagId = h.hashtagId
+//         WHERE ph.postId = ?`,
+//         [post.postId]
+//       );
+//       post.hashtags = hashtags.map((ht) => ht.tag);
+//     }
+
+//     res.send(posts);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "서버 오류가 발생했습니다." }); // 에러 처리 추가
+//   }
+// });
+
 export default feedRouter;

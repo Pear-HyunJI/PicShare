@@ -65,10 +65,11 @@ authRouter.post("/check-nickname", (req, res) => {
 // JOIN 기능
 authRouter.post("/join", upload.single("photo"), (req, res) => {
   const { email, userName, userNickname, password } = req.body;
-  const photo = req.file;
+  let photo = req.file ? req.file.filename : "defaultProfile.jpg"; // 기본 프로필 사진 설정
+
   db.query(
-    `INSERT INTO users (email, userName, userNickname, password, photo) VALUES (?, ?, ?, ?, ?)`,
-    [email, userName, userNickname, password, photo.filename],
+    `INSERT INTO users (email, userName, userNickname, password, profilePicture) VALUES (?, ?, ?, ?, ?)`,
+    [email, userName, userNickname, password, photo],
     (err, result) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {

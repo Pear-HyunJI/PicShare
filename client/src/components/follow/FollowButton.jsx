@@ -1,37 +1,53 @@
-import React from 'react';
-import axios from 'axios';
-import styled from "styled-components";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { fetchFollowingList, fetchFollowerList } from "@/store/follow";
 
-const StyledButton = styled.button`
-  background-color: skyblue;
-  border: none;
-  color: #fff;
-  padding: 10px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 15px;
-  margin: 20px 21px;
-  cursor: pointer;
-  border-radius: 8px;
+const FollowButton = ({ userNo }) => {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.members.user);
+  const followingList = useSelector((state) => state.follows.followingList);
+  const [isFollowing, setIsFollowing] = useState(false);
 
-  &:hover {
-    background-color: #fff;
-    color:skyblue;
-  }
-`;
+  useEffect(() => {
+    if (followingList && followingList.length > 0) {
+      setIsFollowing(
+        followingList.some((followee) => followee.userNo === userNo)
+      );
+    }
+  }, [followingList, userNo]);
 
-const FollowButton = ({ userId, followerId }) => {
-  const handleFollow = () => {
-    axios.post('/followers', { userId, followerId })
-      .then(response => {
-        console.log(response.data);
-        // 상태를 업데이트하여 팔로워 수를 증가시키는 로직을 추가함
-      })
-      .catch(error => console.error('Error following user:', error));
+  const handleFollow = async () => {
+    try {
+      await axios.post("http://localhost:8001/follow/followfunction", {
+        followerId: currentUser.userNo,
+        followeeId: userNo,
+      });
+      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
   };
 
-  return <StyledButton onClick={handleFollow}>Follow</StyledButton>;
+  const handleUnfollow = async () => {
+    try {
+      await axios.post("http://localhost:8001/follow/unfollowfunction", {
+        followerId: currentUser.userNo,
+        followeeId: userNo,
+      });
+      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+  };
+
+  return (
+    <button onClick={isFollowing ? handleUnfollow : handleFollow}>
+      {isFollowing ? "Unfollow" : "Follow"}
+    </button>
+  );
 };
 
 export default FollowButton;
