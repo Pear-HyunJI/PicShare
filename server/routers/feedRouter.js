@@ -180,14 +180,16 @@ feedRouter.get("/all", (req, res) => {
                 });
               }
 
-              // 이미지를 포스트에 매핑
+              // 각각의 이미지를 해당 포스트에 매핑
+              // acc : 포스트 ID를 키, 해당 키에 속하는 이미지 배열 가지는 변수
+              // image : imagesdata(위 쿼리에서는 images테이블의 모든 데이터를 가져왔음) 배열의 각 객체
               const imagesByPostId = imagesdata.reduce((acc, image) => {
                 if (!acc[image.postId]) acc[image.postId] = [];
                 acc[image.postId].push(image);
                 return acc;
               }, {});
 
-              // 해시태그를 포스트에 매핑
+              // 각각의 해시태그를 해당 포스트에 매핑
               const hashtagsByPostId = hashtagsdata.reduce((acc, hashtag) => {
                 if (!acc[hashtag.postId]) acc[hashtag.postId] = [];
                 acc[hashtag.postId].push(hashtag.tag);

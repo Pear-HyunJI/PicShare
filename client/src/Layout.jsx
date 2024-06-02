@@ -78,9 +78,10 @@ const Layout = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.members.user);
 
+  // (sessionStorage) 새로고침-> 로그인 유지 || 페이지 닫기-> 로그인 유지안되게
   useEffect(() => {
-    if (localStorage.getItem("loging")) {
-      const { userNo } = JSON.parse(localStorage.getItem("loging"));
+    if (sessionStorage.getItem("loging")) {
+      const { userNo } = JSON.parse(sessionStorage.getItem("loging"));
       axios
         .post("http://localhost:8001/auth/refresh", { userNo })
         .then((res) => {

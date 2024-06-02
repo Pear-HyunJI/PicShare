@@ -27,14 +27,16 @@ const memberSlice = createSlice({
         profilePicture,
         created_at,
       };
-      localStorage.loging = JSON.stringify({ userNo: userNo, email: email });
+      // (sessionStorage) 새로고침-> 로그인 유지 || 페이지 닫기-> 로그인 유지안되게
+      sessionStorage.loging = JSON.stringify({ userNo: userNo, email: email });
     },
     localUser(state, action) {
       state.user = action.payload;
     },
     userLogout(state, action) {
       state.user = null;
-      localStorage.clear();
+      // (sessionStorage) 새로고침-> 로그인 유지 || 페이지 닫기-> 로그인 유지안되게
+      sessionStorage.clear();
     },
     initUsers(state, action) {
       state.users = action.payload;
