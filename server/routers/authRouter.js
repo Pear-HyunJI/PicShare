@@ -162,7 +162,7 @@ authRouter.post("/remove", (req, res) => {
 // all users 가져오기
 authRouter.get("/users", (req, res) => {
   db.query(
-    `SELECT userNo, userName, userNickname, photo FROM users`,
+    `SELECT userNo, userName, userNickname, profilePicture FROM users`,
     (err, usersdata) => {
       if (err) {
         console.log(err);

@@ -33,7 +33,7 @@ const UserSearchSection = () => {
         {users &&
           users.map((u) => (
             <li key={u.userNo}>
-              <img src={u.photo} alt={u.userNickname} />
+              <img src={u.profilePicture} alt={u.userNickname} />
               <span>{u.userNickname}</span>
               <FollowButton userNo={u.userNo} />
             </li>
