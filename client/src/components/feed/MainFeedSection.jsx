@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { fetchAllFeed } from "@/store/feed";
@@ -74,17 +75,19 @@ const MainFeedSection = ({ filter }) => {
       {filteredFeeds.map((post) => (
         <PostBlock key={post.postId}>
           <PostHeader>
-            <img
-              src={`http://localhost:8001/uploads/${post.profilePicture}`}
-              alt={post.userNickname}
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                marginRight: "10px",
-              }}
-            />
-            <span>{post.userNickname}</span>
+            <Link to={`/personalpage/${post.userNo}`}>
+              <img
+                src={`http://localhost:8001/uploads/${post.profilePicture}`}
+                alt={post.userNickname}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                }}
+              />
+              <span>{post.userNickname}</span>
+            </Link>
           </PostHeader>
           <PostImages>
             {post.feedImages &&

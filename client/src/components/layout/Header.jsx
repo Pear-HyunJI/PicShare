@@ -56,8 +56,6 @@ const Header = () => {
           <Link to="/usersearch">
             <FaSearch />
           </Link>
-          <input type="text" placeholder="검색어를 입력하세요." />
-          {/* 나중에 검색기능 도입 */}
         </Search>
         <Like>
           <Link to="/">
