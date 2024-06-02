@@ -133,84 +133,89 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
   );
 });
 
-// 모든 유저의 포스트 가져옴
+// 유저의 포스트 가져옴
 feedRouter.get("/all", (req, res) => {
-  db.query(
-    `SELECT p.*, u.userNickname, u.profilePicture 
-      FROM posts p 
-      JOIN users u ON p.userNo = u.userNo 
-      ORDER BY p.created_at DESC`,
-    (err, posts) => {
-      if (err) {
-        console.log(err);
-        return res.json({
-          message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-        });
-      }
+  const { userNo } = req.query;
 
-      const postIds = posts.map((post) => post.postId);
+  let query = `SELECT p.*, u.userNickname, u.profilePicture 
+               FROM posts p 
+               JOIN users u ON p.userNo = u.userNo`;
 
-      // 피드 이미지 가져옴
-      db.query(
-        ` SELECT i.* FROM images i WHERE i.postId IN (?) `,
-        [postIds],
-        (err, imagesdata) => {
-          if (err) {
-            console.log(err);
-            return res.json({
-              message: "피드의 이미지를 가져오던 중 오류가 발생했습니다.",
-            });
-          }
+  // fecthAllFeed에서 userNo가 왔을때, 여기서 userNo는 팔로잉리스트에 있는 유저넘버!!
+  // 따라서 팔로잉한 유저의 피드만 가져오기!
+  if (userNo) {
+    query += ` WHERE p.userNo = ${userNo}`;
+  }
+  // 가져온 userNo가 없을때는 모든유저의 피드 가져오기
+  query += ` ORDER BY p.created_at DESC`;
 
-          // 해시태그 가져옴
-          db.query(
-            `
-            SELECT ph.postId, h.tag
-            FROM post_hashtags ph
-            JOIN hashtags h ON ph.hashtagId = h.hashtagId
-            WHERE ph.postId IN (?)
-            `,
-            [postIds],
-            (err, hashtagsdata) => {
-              if (err) {
-                console.log(err);
-                return res.json({
-                  message:
-                    "피드의 해시태그를 가져오던 중 오류가 발생했슴니다람쥐",
-                });
-              }
-
-              // 각각의 이미지를 해당 포스트에 매핑
-              // acc : 포스트 ID를 키, 해당 키에 속하는 이미지 배열 가지는 변수
-              // image : imagesdata(위 쿼리에서는 images테이블의 모든 데이터를 가져왔음) 배열의 각 객체
-              const imagesByPostId = imagesdata.reduce((acc, image) => {
-                if (!acc[image.postId]) acc[image.postId] = [];
-                acc[image.postId].push(image);
-                return acc;
-              }, {});
-
-              // 각각의 해시태그를 해당 포스트에 매핑
-              const hashtagsByPostId = hashtagsdata.reduce((acc, hashtag) => {
-                if (!acc[hashtag.postId]) acc[hashtag.postId] = [];
-                acc[hashtag.postId].push(hashtag.tag);
-                return acc;
-              }, {});
-
-              // 결과를 최종 포스트 데이터에 합침
-              const result = posts.map((post) => ({
-                ...post,
-                feedImages: imagesByPostId[post.postId] || [],
-                feedHashtags: hashtagsByPostId[post.postId] || [],
-              }));
-
-              console.log("서버에서 보내주는 올피드데이터", result);
-              res.send(result);
-            }
-          );
-        }
-      );
+  db.query(query, (err, posts) => {
+    if (err) {
+      console.log(err);
+      return res.json({
+        message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     }
-  );
+
+    const postIds = posts.map((post) => post.postId);
+
+    // 피드 이미지 가져옴
+    db.query(
+      ` SELECT i.* FROM images i WHERE i.postId IN (?) `,
+      [postIds],
+      (err, imagesdata) => {
+        if (err) {
+          console.log(err);
+          return res.json({
+            message: "피드의 이미지를 가져오던 중 오류가 발생했습니다.",
+          });
+        }
+
+        // 해시태그 가져옴
+        db.query(
+          `
+          SELECT ph.postId, h.tag
+          FROM post_hashtags ph
+          JOIN hashtags h ON ph.hashtagId = h.hashtagId
+          WHERE ph.postId IN (?)
+          `,
+          [postIds],
+          (err, hashtagsdata) => {
+            if (err) {
+              console.log(err);
+              return res.json({
+                message: "피드의 해시태그를 가져오던 중 오류가 발생했습니다.",
+              });
+            }
+
+            // 각각의 이미지를 해당 포스트에 매핑
+            const imagesByPostId = imagesdata.reduce((acc, image) => {
+              if (!acc[image.postId]) acc[image.postId] = [];
+              acc[image.postId].push(image);
+              return acc;
+            }, {});
+
+            // 각각의 해시태그를 해당 포스트에 매핑
+            const hashtagsByPostId = hashtagsdata.reduce((acc, hashtag) => {
+              if (!acc[hashtag.postId]) acc[hashtag.postId] = [];
+              acc[hashtag.postId].push(hashtag.tag);
+              return acc;
+            }, {});
+
+            // 결과를 최종 포스트 데이터에 합침
+            const result = posts.map((post) => ({
+              ...post,
+              feedImages: imagesByPostId[post.postId] || [],
+              feedHashtags: hashtagsByPostId[post.postId] || [],
+            }));
+
+            console.log("서버에서 보내주는 올피드데이터", result);
+            res.send(result);
+          }
+        );
+      }
+    );
+  });
 });
 
 export default feedRouter;
