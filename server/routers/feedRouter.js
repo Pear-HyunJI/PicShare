@@ -26,16 +26,17 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
   }
 
   // schedule_at가 제공되는지 확인
+  const createdAtValue = scheduled_at ? scheduled_at : new Date();
   const scheduledAtValue = scheduled_at ? scheduled_at : null;
 
   // post테이블에 userNo, content, scheduled_at(예약설정시간) 저장
   db.query(
-    `INSERT INTO posts (userNo, content, scheduled_at) VALUES (?, ?, ?)`,
-    [userNo, content, scheduledAtValue],
+    `INSERT INTO posts (userNo, content, scheduled_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
+    [userNo, content, scheduledAtValue, createdAtValue, createdAtValue],
     (err, result) => {
       if (err) {
         console.error("post인서트 에러:", err);
-        return res.json({ message: "서버 오류가 발생했습니다.?" });
+        return res.json({ message: "서버 오류가 발생했습니다." });
       }
 
       const postId = result.insertId;

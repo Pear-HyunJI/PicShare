@@ -57,10 +57,21 @@ const MainFeedSection = ({ filter }) => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  // 현재 시간을 가져오는 함수
+  const getCurrentTime = () => {
+    return new Date();
+  };
+
+  // 피드가 현재 시간과 같거나 현재 시간 이후에 생성된 경우만 필터링
+  const filteredFeeds = feeds.filter((post) => {
+    const createdAt = new Date(post.created_at);
+    return createdAt <= getCurrentTime();
+  });
+
   return (
     <MainFeedSectionBlock>
       <h2>{filter.type === "all" ? "모든 피드" : "팔로잉한 사람 피드"}</h2>
-      {feeds.map((post) => (
+      {filteredFeeds.map((post) => (
         <PostBlock key={post.postId}>
           <PostHeader>
             <img
