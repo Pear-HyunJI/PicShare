@@ -6,7 +6,7 @@ const userprofileRouter = express.Router();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'photo/');
+    cb(null, 'profilePicture/');
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-userprofileRouter.post('/uploads', upload.single('photo'), (req, res) => {
+userprofileRouter.post('/uploads', upload.single('profilePicture'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).send('No files were uploaded.');
