@@ -5,6 +5,7 @@ export const db = mysql.createConnection({
   user: "root",
   password: "1234",
   database: "picshare",
+  connectionLimit:10,
 });
 
 db.connect((err) => {

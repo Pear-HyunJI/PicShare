@@ -22,6 +22,7 @@ import authRouter from "./routers/authRouter.js";
 import feedRouter from "./routers/feedRouter.js";
 import userprofileRouter from "./routers/userprofileRouter.js";
 import followRouter from "./routers/followRouter.js";
+import otherRouter from "./routers/otherRouter.js";
 
 // 리소스 파일들을 관리하는 경로 지정하기
 const __dirname = path.resolve();
@@ -32,6 +33,7 @@ app.use("/auth", authRouter);
 app.use("/feed", feedRouter);
 app.use("/users", userprofileRouter);
 app.use("/follow", followRouter);
+app.use("/other", otherRouter);
 
 // 지정한 포트에서 서버를 실행함
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
