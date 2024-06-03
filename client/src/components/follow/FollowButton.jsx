@@ -23,8 +23,9 @@ const FollowButton = ({ userNo }) => {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });
-      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
-      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+      await dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      await dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+      setIsFollowing(true);
     } catch (error) {
       console.error("Error following user:", error);
     }
@@ -36,8 +37,9 @@ const FollowButton = ({ userNo }) => {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });
-      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
-      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+      await dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      await dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
+      setIsFollowing(false);
     } catch (error) {
       console.error("Error unfollowing user:", error);
     }
