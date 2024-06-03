@@ -1,10 +1,10 @@
 import React from "react";
-import ProfileModifySection from "@/components/member/ProfileModifySection";
+import ProfileModify from "@/components/member/ProfileModify";
 
 const ProfileModifyView = () => {
   return (
     <div>
-      <ProfileModifySection />
+      <ProfileModify />
     </div>
   );
 };
