@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PersonalFeedSection from "@/components/feed/PersonalFeedSection";
 import ProfileSection from "@/components/member/ProfileSection";
 
 const PersonalPageView = () => {
+  const [filteredFeeds, setFilteredFeeds] = useState([]);
+  const length = filteredFeeds.length;
+
   return (
     <div>
-      <ProfileSection />
-      <PersonalFeedSection />
+      <ProfileSection length={length} />
+      <PersonalFeedSection
+        setFilteredFeeds={setFilteredFeeds}
+        filteredFeeds={filteredFeeds}
+      />
     </div>
   );
 };

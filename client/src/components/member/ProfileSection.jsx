@@ -18,14 +18,26 @@ const ProfileSectionBlock = styled.div`
     }
     img {
       width: 150px;
+      height: 150px;
       border-radius: 50%;
     }
+    .length {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+  .modify {
+    // color: red;
+    // border: 1px solid red;
+    width: 150px;
+    text-align: right;
   }
 `;
 
 // url으로 보낸 번호로 유저정보 가져와야 할거 같음
 
-const ProfileSection = () => {
+const ProfileSection = ({ length }) => {
   const dispatch = useDispatch();
   const { userNo } = useParams(); // URL에서 유저넘버 추출
   const targetUserNo = parseInt(userNo); // URL에서 받아온 유저넘버
@@ -37,6 +49,8 @@ const ProfileSection = () => {
 
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
+
+  console.log("필터드피드스개수", length);
 
   useEffect(() => {
     if (currentUserNo) {
@@ -87,20 +101,32 @@ const ProfileSection = () => {
 
   return (
     <ProfileSectionBlock>
+      <div>{user[0].userNickname}</div>
       <div className="profile">
         <img
           src={`http://localhost:8001/uploads/${user[0].profilePicture}`}
           alt="프로필사진"
         />
-        <p>게시물</p>
-        <p>팔로워: {followers.length || 0}</p>
-        <p>팔로잉: {following.length || 0}</p>
+        <div className="length">
+          <p>{length}</p>
+          <p>게시물</p>
+        </div>
+        <div className="length">
+          <p>{followers.length || 0}</p>
+          <p>팔로워</p>
+        </div>
+        <div className="length">
+          <p>{following.length || 0}</p>
+          <p>팔로잉</p>
+        </div>
       </div>
-      {currentUserNo == targetUserNo && (
-        <Link to="/profilemodify">
-          <FaPen />
-        </Link>
-      )}
+      <div className="modify">
+        {currentUserNo == targetUserNo && (
+          <Link to="/profilemodify">
+            <FaPen />
+          </Link>
+        )}
+      </div>
       <div className="btn">
         {currentUserNo !== targetUserNo && (
           <FollowButton userNo={targetUserNo} />

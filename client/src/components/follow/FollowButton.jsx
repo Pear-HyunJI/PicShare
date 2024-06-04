@@ -5,13 +5,21 @@ import axios from "axios";
 import { fetchFollowingList, fetchFollowerList } from "@/store/follow";
 
 const FollowButtonBlock = styled.div`
+  margin: 10px 27px;
+  display: flex;
+  align-items: center;
+
   button {
-    padding: 7px 18px;
+    width: 100px;
+    height: 35px;
     cursor: pointer;
-    border: none;
     background-color: #09dd52;
-    color: white;
-    border-radius: 5px;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 10px;
+    &:hover {
+      background-color: #09bd52;
+    }
   }
 `;
 

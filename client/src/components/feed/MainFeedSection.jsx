@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import Slider from "react-slick";
-import { fetchAllFeed } from "@/store/feed";
 import "slick-carousel/slick/slick.css";
+import { fetchAllFeed } from "@/store/feed";
 import axios from "axios";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
@@ -49,6 +50,18 @@ const PostHeader = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+  .like {
+    position: absolute;
+    right: 10px;
+    color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
 `;
 
 const PostContent = styled.div`
@@ -85,10 +98,6 @@ const MainFeedSection = ({ filter, posts }) => {
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
 
-  // 좋아요
-  const user = useSelector((state) => state.members.user);
-  const [hearts, setHearts] = useState([]);
-
   useEffect(() => {
     // 피드 데이터를 가져오는 로직
     if (filter.type === "all") {
@@ -96,8 +105,14 @@ const MainFeedSection = ({ filter, posts }) => {
     } else if (filter.type === "following") {
       dispatch(fetchAllFeed(filter));
     }
+  }, [filter]);
 
-    // 좋아요 데이터를 가져오는 로직
+  // 좋아요
+  const user = useSelector((state) => state.members.user);
+  const [hearts, setHearts] = useState([]);
+
+  // 좋아요 데이터를 가져오는 로직
+  useEffect(() => {
     if (user) {
       axios
         .post("http://localhost:8001/other/post/likeList", {
@@ -105,17 +120,15 @@ const MainFeedSection = ({ filter, posts }) => {
         })
         .then((res) => {
           if (res.data) {
-            let initialHearts = posts.map((post) => ({
-              postId: post.id,
-              isLiked: 0,
+            let initialHearts = res.data.map((post) => ({
+              postId: post.postId,
+              isLiked: post.isLiked,
             }));
-            const updatedHearts = initialHearts.map((heart) => {
-              const dbHeart = res.data.find(
-                (item) => item.postId === heart.postId
-              );
-              return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
-            });
-            setHearts(updatedHearts);
+            // const updatedHearts = initialHearts.map((heart) => {
+            //   const dbHeart = res.data.find((item) => item.postId === heart.postId);
+            //   return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
+            // });
+            setHearts(initialHearts);
           } else {
             console.log("좋아요 데이터를 가져오는데 실패했습니다.");
           }
@@ -124,9 +137,9 @@ const MainFeedSection = ({ filter, posts }) => {
           console.error("좋아요 데이터를 가져오는 중 오류 발생:", error);
         });
     }
-  }, [dispatch, filter, user, posts]);
+  }, [dispatch, user]);
 
-  const onToggle = (postItem) => {
+  const onToggle = (postItem, index) => {
     if (user) {
       const updateHearts = hearts.map((heart) =>
         heart.postId === postItem.id
@@ -182,7 +195,7 @@ const MainFeedSection = ({ filter, posts }) => {
 
   return (
     <MainFeedSectionBlock>
-      {filteredFeeds.map((post) => {
+      {filteredFeeds.map((post, index) => {
         return (
           <PostBlock key={post.postId}>
             <PostHeader>
@@ -199,6 +212,14 @@ const MainFeedSection = ({ filter, posts }) => {
                 />
                 <span>{post.userNickname}</span>
               </Link>
+              <span className="like" onClick={() => onToggle(post, index)}>
+                {hearts.find((heart) => heart.postId === post.postId)
+                  ?.isLiked ? (
+                  <FaHeart />
+                ) : (
+                  <FaRegHeart />
+                )}
+              </span>
             </PostHeader>
             {post.feedImages && post.feedImages.length > 1 ? (
               <div className="slidesection">

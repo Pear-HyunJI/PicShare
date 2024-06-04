@@ -5,14 +5,13 @@ import { fetchFollowingList } from "@/store/follow"; // 팔로잉 리스트 가�
 
 const MainFeedCategorySectionBlock = styled.div`
   display: flex;
-  justify-content: left;
-  margin: 30px 10px 0px;
-
+  justify-content: center;
+  margin: 40px 0px;
   button {
     margin: 0 10px;
     padding: 10px 20px;
     cursor: pointer;
-    border: none;
+    border: 1px solid;
     background-color: #09dd52;
     color: white;
     border-radius: 5px;

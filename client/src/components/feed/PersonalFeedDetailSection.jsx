@@ -1,20 +1,17 @@
-import React from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import styled from "styled-components";
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import { IoIosArrowBack } from "react-icons/io";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 
-const TagSearchDetailSectionBlock = styled.div`
+const PersonalFeedDetailSectionBlock = styled.div`
   padding: 20px;
   .top {
     .tag {
       margin: 10px 0;
       display: flex;
-      // justify-content: space-between;
       align-items: center;
       gap: 10px;
       margin: 20px 0 30px;
@@ -37,6 +34,33 @@ const TagSearchDetailSectionBlock = styled.div`
       text-align: center;
       align-items: center;
       margin: 0 0 50px;
+    }
+    .slidesection {
+      .slick-dots {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translate(-50%);
+        li {
+          display: inline-block;
+          padding: 0 3.5px;
+          button {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            text-indent: -9999px;
+            overflow: hidden;
+          }
+          &.slick-active {
+            button {
+              width: 12px;
+              height: 12px;
+              background: #09dd52;
+            }
+          }
+        }
+      }
     }
   }
   .slidesection {
@@ -111,30 +135,19 @@ const PostImage = styled.img`
   display: inline-block;
 `;
 
-const TagSearchDetailSection = () => {
-  const navigate = useNavigate();
-
+const PersonalFeedDetailSection = () => {
   const { postId } = useParams();
   const location = useLocation();
-  const { searchTerm, currentSlide } = location.state || ""; // 서치 결과 받아온거
-  const allFeeds = useSelector((state) => state.feeds.feeds);
-
-  const filteredFeeds = allFeeds.filter((feed) =>
-    feed.feedHashtags.some((hashtag) =>
-      hashtag.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const navigate = useNavigate();
+  const { filteredFeeds } = location.state || { filteredFeeds: [] };
 
   const postIndex = filteredFeeds.findIndex(
     (feed) => feed.postId === parseInt(postId)
   );
   const postsToDisplay = filteredFeeds.slice(postIndex);
 
-  console.log("필터드피드~", filteredFeeds);
-  console.log("서치텀~", postsToDisplay);
-
   const handleBack = () => {
-    navigate(-1, { state: { currentSlide } });
+    navigate(-1);
   };
 
   const sliderSettings = {
@@ -145,17 +158,18 @@ const TagSearchDetailSection = () => {
     slidesToScroll: 1,
   };
 
+  if (!filteredFeeds.length) return <div>Loading...</div>;
   return (
-    <TagSearchDetailSectionBlock>
+    <PersonalFeedDetailSectionBlock>
       <div className="top">
         <div className="tag">
           <button onClick={handleBack}>
             <IoIosArrowBack />
           </button>
-          <h2>#{searchTerm}</h2>
+          <h2>내 게시글</h2>
         </div>
         <div className="num">
-          <span>게시물{postsToDisplay.length}개</span>
+          <span>게시물 {postsToDisplay.length}개</span>
         </div>
       </div>
       {postsToDisplay.map((post) => (
@@ -230,8 +244,8 @@ const TagSearchDetailSection = () => {
           </PostFooter>
         </PostBlock>
       ))}
-    </TagSearchDetailSectionBlock>
+    </PersonalFeedDetailSectionBlock>
   );
 };
 
-export default TagSearchDetailSection;
+export default PersonalFeedDetailSection;

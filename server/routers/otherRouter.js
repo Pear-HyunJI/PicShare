@@ -4,26 +4,91 @@ import dayjs from "dayjs";
 
 const otherRouter = express.Router();
 
-// otherRouter.post("/post/likeToggle", (req, res) => {
-//   try {
-//     const { postId } = req.body;
-//     // 해당 포스트의 좋아요 상태를 토글합니다.
-//     const [rows] = db.query("SELECT isLiked FROM posts WHERE postId = ?", [
-//       postId,
-//     ]);
-//     const isLiked = rows[0].isLiked ? 0 : 1;
-//     db.query("UPDATE posts SET isLiked = ? WHERE postId = ?", [
-//       isLiked,
-//       postId,
-//     ]);
+otherRouter.post("/post/likeList", (req, res) => {
+  const userNo = req.body.userNo;
+  db.query(`SELECT * FROM postlike WHERE userNo=?`, [userNo], (err, result) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+    } else {
+      res.send(result);
+    }
+  });
+});
 
-//     // 업데이트된 포스트 리스트를 반환합니다.
-//     const updatedPosts = db.query("SELECT * FROM posts");
-//     res.json(updatedPosts);
-//   } catch (error) {
-//     console.error("Error toggling like:", error);
-//     res.status(500).json({ error: "Failed to toggle like" });
-//   }
-// });
+otherRouter.post("/post/likeToggle", (req, res) => {
+  db.getConnection((err, connection) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+      return;
+    }
+
+    connection.beginTransaction((err) => {
+      if (err) {
+        console.error("에러", err);
+        res.status(500).send("실패");
+        connection.release();
+        return;
+      }
+
+      const { post, userNo } = req.body;
+      const date = dayjs();
+
+      const insertLikeQuery = `
+        INSERT INTO postlike (userNo, postId, postPhoto, isLiked, date) 
+        VALUES (?, ?, ?, 1, ?)
+        ON DUPLICATE KEY UPDATE isLiked = NOT isLiked`;
+
+      connection.query(
+        insertLikeQuery,
+        [
+          userNo,
+          post.postId,
+          post.postPhoto,
+          date.format("YYYY-MM-DD HH:mm:ss"),
+        ],
+        (err, result) => {
+          if (err) {
+            return connection.rollback(() => {
+              connection.release();
+              res.status(500).send(err);
+            });
+          }
+
+          if (result.affectedRows !== 0) {
+            const selectLikeQuery = "SELECT * FROM postlike WHERE userNo=?";
+            connection.query(selectLikeQuery, [userNo], (err, result) => {
+              if (err) {
+                return connection.rollback(() => {
+                  connection.release();
+                  res.status(500).send(err);
+                });
+              }
+
+              connection.commit((err) => {
+                if (err) {
+                  return connection.rollback(() => {
+                    connection.release();
+                    res.status(500).send(err);
+                  });
+                }
+
+                console.log("결과", result);
+                connection.release();
+                res.send(result);
+              });
+            });
+          } else {
+            connection.rollback(() => {
+              connection.release();
+              res.status(500).send("좋아요 업데이트 실패");
+            });
+          }
+        }
+      );
+    });
+  });
+});
 
 export default otherRouter;
