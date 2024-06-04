@@ -1,54 +1,68 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { fetchAllFeed } from "@/store/feed";
 
-const PersonalFeedSectionBlock = styled.div``;
+const PersonalFeedSectionBlock = styled.div`
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  .personalfeed {
+    padding: 10px;
+    flex: 0 0 32%;
+    text-align: center;
+    img {
+      display: inline-block;
+      height: 200px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  }
+`;
 
-const PersonalFeedSection = () => {
+const PersonalFeedSection = ({ setFilteredFeeds, filteredFeeds }) => {
   const dispatch = useDispatch();
-  const { userNo } = useParams(); // URL에서 유저넘버 추출
-  const targetUserNo = parseInt(userNo); // URL에서 받아온 유저넘버
-  const [loading, setLoading] = useState(true);
-  const feeds = useSelector((state) => state.feeds.feeds);
-  // const [feeds, setFeeds] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchTargetUserData = (targetUserNo) => {
-  //     axios
-  //       .get(`http://localhost:8001/auth/users?targetUserNo=${targetUserNo}`)
-  //       .then((res) => {
-  //         const data = res.data;
-  //         setUser(data);
-  //         setLoading(false);
-  //       })
-  //       .catch((err) => console.log(err));
-  //   };
-
-  //   fetchTargetUserData(targetUserNo);
-  // }, [targetUserNo]);
+  const navigate = useNavigate();
+  const { userNo } = useParams();
+  const targetUserNo = parseInt(userNo);
+  const { feeds, loading, error } = useSelector((state) => state.feeds);
+  // const [filteredFeeds, setFilteredFeeds] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchAllFeed(15));
-    // setFeeds(feeds);
-    setLoading(false);
-    console.log("개인피드즈", feeds);
-    console.log("개인피드즈", feeds);
-  }, []);
+    dispatch(fetchAllFeed());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (feeds) {
+      const userFeeds = feeds.filter((feed) => feed.userNo === targetUserNo);
+      setFilteredFeeds(userFeeds);
+    }
+  }, [feeds, targetUserNo]);
+
+  const handleFeedClick = (postId) => {
+    navigate(`/personaldetailfeed/${postId}`, {
+      state: { filteredFeeds },
+    });
+  };
 
   if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <PersonalFeedSectionBlock>
-      {feeds.map((feed) => (
-        <div key={feed.postId}>
-          <div>
-            {feed.feedImages.length > 0 && (
-              <img src={feed.feedImages[0].imageUrl} alt="" />
-            )}
-            <p>{feed.content}</p>
-          </div>
+      {filteredFeeds.map((feed) => (
+        <div
+          key={feed.postId}
+          className="personalfeed"
+          onClick={() => handleFeedClick(feed.postId)}
+        >
+          {feed.feedImages.length > 0 && (
+            <img src={feed.feedImages[0].imageUrl} alt="" />
+          )}
         </div>
       ))}
     </PersonalFeedSectionBlock>
