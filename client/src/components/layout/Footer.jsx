@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "@/store/member";
 import { FaUserCheck, FaUserTimes } from "react-icons/fa";
@@ -52,7 +51,6 @@ const Footer = () => {
     <FooterBlock>
       {user ? (
         <div className="menu">
-          {/* <h2>푸터</h2> */}
           <Loginout>
             <a href="#" onClick={handleLogout}>
               <FaUserCheck />
@@ -75,7 +73,6 @@ const Footer = () => {
         </div>
       ) : (
         <div>
-          {/* <h2>푸터</h2> */}
           <Loginout>
             <FaUserTimes />
           </Loginout>

@@ -142,8 +142,9 @@ feedRouter.get("/all", (req, res) => {
                FROM posts p 
                JOIN users u ON p.userNo = u.userNo`;
 
-  // fecthAllFeed에서 userNo가 왔을때, 여기서 userNo는 팔로잉리스트에 있는 유저넘버!!
-  // 따라서 팔로잉한 유저의 피드만 가져오기!
+  // fecthAllFeed에서 userNo가 왔을때, 여기서 userNo는 팔로잉리스트에 있는 유저넘버!!(메인피드에서)
+  // 따라서 팔로잉한 유저의 피드만 가져오기!(메인피드에서)
+  // 개인페이지에서 가져오는건 타겟유저넘버
   if (userNo) {
     query += ` WHERE p.userNo = ${userNo}`;
   }

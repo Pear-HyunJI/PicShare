@@ -8,6 +8,7 @@ import PersonalPageView from "@/views/PersonalPageView";
 import ProfileModifyView from "@/views/ProfileModifyView";
 import FeedInsertView from "@/views/FeedInsertView";
 import UserSearchView from "@/views/UserSearchView";
+import TagSearchDetailView from "@/views/TagSearchDetailView";
 
 const App = () => {
   return (
@@ -21,6 +22,10 @@ const App = () => {
         <Route path="/profilemodify" element={<ProfileModifyView />} />
         <Route path="/feedinsert" element={<FeedInsertView />} />
         <Route path="/usersearch" element={<UserSearchView />} />
+        <Route
+          path="/tagsearchdetail/:postId"
+          element={<TagSearchDetailView />}
+        />
       </Route>
     </Routes>
   );

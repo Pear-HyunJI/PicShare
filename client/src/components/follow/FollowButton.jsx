@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { fetchFollowingList, fetchFollowerList } from "@/store/follow";
+
+const FollowButtonBlock = styled.div`
+  button {
+    padding: 7px 18px;
+    cursor: pointer;
+    border: none;
+    background-color: #09dd52;
+    color: white;
+    border-radius: 5px;
+  }
+`;
 
 const FollowButton = ({ userNo }) => {
   const dispatch = useDispatch();
@@ -23,9 +35,8 @@ const FollowButton = ({ userNo }) => {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });
-      await dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
-      await dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
-      setIsFollowing(true);
+      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
     } catch (error) {
       console.error("Error following user:", error);
     }
@@ -37,18 +48,19 @@ const FollowButton = ({ userNo }) => {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });
-      await dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
-      await dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
-      setIsFollowing(false);
+      dispatch(fetchFollowingList(currentUser.userNo)); // 팔로잉 목록 업데이트
+      dispatch(fetchFollowerList(currentUser.userNo)); // 팔로워 목록 업데이트
     } catch (error) {
       console.error("Error unfollowing user:", error);
     }
   };
 
   return (
-    <button onClick={isFollowing ? handleUnfollow : handleFollow}>
-      {isFollowing ? "Unfollow" : "Follow"}
-    </button>
+    <FollowButtonBlock>
+      <button onClick={isFollowing ? handleUnfollow : handleFollow}>
+        {isFollowing ? "Unfollow" : "Follow"}
+      </button>
+    </FollowButtonBlock>
   );
 };
 
