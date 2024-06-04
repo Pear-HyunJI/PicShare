@@ -5,6 +5,7 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import { fetchAllFeed } from "@/store/feed";
 import "slick-carousel/slick/slick.css";
+import axios from "axios";
 
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
