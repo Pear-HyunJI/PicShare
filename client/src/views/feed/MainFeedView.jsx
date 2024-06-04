@@ -12,7 +12,7 @@ const MainFeedView = () => {
 
   return (
     <MainFeedViewBlock>
-      <MainFeedCategorySection setFilter={setFilter} />
+      <MainFeedCategorySection setFilter={setFilter} filter={filter} />
       <MainFeedSection filter={filter} />
     </MainFeedViewBlock>
   );

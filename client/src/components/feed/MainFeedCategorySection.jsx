@@ -1,29 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
+import styled from "styled-components"; 
 import { fetchFollowingList } from "@/store/follow"; // 팔로잉 리스트 가져오는 액션 추가
 
 const MainFeedCategorySectionBlock = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
-
-  button {
+  margin: 40px 0px;
+    button{
     margin: 0 10px;
     padding: 10px 20px;
     cursor: pointer;
-    border: none;
-    background-color: #007bff;
+    border: 1px solid;
+    background-color: #09dd52;
     color: white;
     border-radius: 5px;
 
     &:hover {
-      background-color: #0056b3;
+      background-color: #09bd52;
     }
-  }
+
+    &.on {
+      background: #09bd52;
+    }
+    }
 `;
 
-const MainFeedCategorySection = ({ setFilter }) => {
+const MainFeedCategorySection = ({ setFilter, filter }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.members.user);
 
@@ -50,8 +53,16 @@ const MainFeedCategorySection = ({ setFilter }) => {
 
   return (
     <MainFeedCategorySectionBlock>
-      <button onClick={() => handleFilterClick("all")}>All</button>
-      <button onClick={() => handleFilterClick("following")}>
+      <button
+        onClick={() => handleFilterClick("all")}
+        className={filter.type == "all" && "on"}
+      >
+        All
+      </button>
+      <button
+        onClick={() => handleFilterClick("following")}
+        className={filter.type == "following" && "on"}
+      >
         Following Feed
       </button>
     </MainFeedCategorySectionBlock>

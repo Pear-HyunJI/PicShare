@@ -1,7 +1,27 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { fetchFollowingList, fetchFollowerList } from "@/store/follow";
+
+const FollowButtonBlock = styled.div`
+margin: 10px 27px;
+display: flex;
+align-items: center;
+
+button {
+  width: 100px;
+  height: 35px;
+  cursor: pointer;
+  background-color: #09dd52;
+  color: #fff;
+  font-size:15px;
+  border-radius: 10px;
+  &:hover {
+    background-color: #09bd52;
+  }
+}
+`
 
 const FollowButton = ({ userNo }) => {
   const dispatch = useDispatch();
@@ -46,9 +66,11 @@ const FollowButton = ({ userNo }) => {
   };
 
   return (
+    <FollowButtonBlock>
     <button onClick={isFollowing ? handleUnfollow : handleFollow}>
       {isFollowing ? "Unfollow" : "Follow"}
     </button>
+    </FollowButtonBlock>
   );
 };
 

@@ -161,19 +161,46 @@ authRouter.post("/remove", (req, res) => {
 
 // all users 가져오기
 authRouter.get("/users", (req, res) => {
-  db.query(
-    `SELECT userNo, userName, userNickname, profilePicture FROM users`,
-    (err, usersdata) => {
-      if (err) {
-        console.log(err);
-        return res.json({
-          message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-        });
+  const { targetUserNo } = req.query;
+  console.log(targetUserNo);
+  // targetUserNo가 있을 때는 해당하는 사용자 정보만 가져오기
+  if (targetUserNo) {
+    db.query(
+      `SELECT userNo, userName, userNickname, profilePicture FROM users WHERE userNo = ?`,
+      [targetUserNo],
+      (err, userData) => {
+        if (err) {
+          console.error(err);
+          s;
+          return res.json({
+            message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+          });
+        }
+        console.log("유저 데이터:", userData);
+        if (userData.length === 0) {
+          return res.json({
+            message: "해당하는 사용자를 찾을 수 없습니다.",
+          });
+        }
+        res.send(userData);
       }
-      console.log("유저데이터", usersdata);
-      res.send(usersdata);
-    }
-  );
+    );
+  } else {
+    // targetUserNo가 없을 때는 모든 사용자 데이터 가져오기
+    db.query(
+      `SELECT userNo, userName, userNickname, profilePicture FROM users`,
+      (err, usersData) => {
+        if (err) {
+          console.error(err);
+          return res.json({
+            message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+          });
+        }
+        console.log("모든 유저 데이터:", usersData);
+        res.send(usersData);
+      }
+    );
+  }
 });
 
 // 로그인 유지

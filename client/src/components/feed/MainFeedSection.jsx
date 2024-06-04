@@ -7,7 +7,6 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import axios from "axios";
 
 const MainFeedSectionBlock = styled.div`
-  // 스타일 정의
 `;
 
 const PostBlock = styled.div`
@@ -18,9 +17,18 @@ const PostBlock = styled.div`
 `;
 
 const PostHeader = styled.div`
-  display: flex;
+ display: flex;
   align-items: center;
   margin-bottom: 10px;
+  position: relative;
+  .like {
+    position: absolute;
+    right:10px;
+    color:#f00;
+    cursor:pointer;
+    z-index:9999;
+    font-size:25px;
+  }
 `;
 
 const PostImages = styled.div`
@@ -49,6 +57,15 @@ const MainFeedSection = ({ filter, posts }) => {
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
 
+  useEffect(() => {
+    // 피드 데이터를 가져오는 로직
+    if (filter.type === "all") {
+      dispatch(fetchAllFeed("all", user.userNo));
+    } else if (filter.type === "following") {
+      dispatch(fetchAllFeed("following", user.userNo));
+    }
+  }, [filter])
+
   // 좋아요
   const user = useSelector((state) => state.members.user);
   const [hearts, setHearts] = useState([]);
@@ -60,19 +77,22 @@ const MainFeedSection = ({ filter, posts }) => {
     } else if (filter.type === "following") {
       dispatch(fetchAllFeed(filter));
     }
+  },[filter])
+
 
     // 좋아요 데이터를 가져오는 로직
+    useEffect(() => {
     if (user) {
       axios
         .post("http://localhost:8001/other/post/likeList", { userNo: user.userNo })
         .then((res) => {
           if (res.data) {
-            let initialHearts = posts.map((post) => ({ postId: post.id, isLiked: 0 }));
-            const updatedHearts = initialHearts.map((heart) => {
-              const dbHeart = res.data.find((item) => item.postId === heart.postId);
-              return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
-            });
-            setHearts(updatedHearts);
+            let initialHearts = res.data.map((post) => ({ postId: post.postId, isLiked: post.isLiked }));
+            // const updatedHearts = initialHearts.map((heart) => {
+            //   const dbHeart = res.data.find((item) => item.postId === heart.postId);
+            //   return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
+            // });
+            setHearts(initialHearts);
           } else {
             console.log("좋아요 데이터를 가져오는데 실패했습니다.");
           }
@@ -81,9 +101,9 @@ const MainFeedSection = ({ filter, posts }) => {
           console.error("좋아요 데이터를 가져오는 중 오류 발생:", error);
         });
     }
-  }, [dispatch, filter, user, posts]);
+  }, [dispatch, user]);
 
-  const onToggle = (postItem) => {
+  const onToggle = (postItem, index) => {
     if (user) {
       const updateHearts = hearts.map((heart) =>
         heart.postId === postItem.id ? { ...heart, isLiked: !heart.isLiked } : heart
@@ -128,8 +148,7 @@ const MainFeedSection = ({ filter, posts }) => {
 
   return (
     <MainFeedSectionBlock>
-      <h2>{filter.type === "all" ? "모든 피드" : "팔로잉한 사람 피드"}</h2>
-      {filteredFeeds.map((post) => (
+      {filteredFeeds.map((post, index) => (
         <PostBlock key={post.postId}>
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
@@ -145,6 +164,9 @@ const MainFeedSection = ({ filter, posts }) => {
               />
               <span>{post.userNickname}</span>
             </Link>
+            <span className="like" onClick={() => onToggle(post, index)}>
+              { hearts.find((heart) => heart.postId === post.postId)?.isLiked ? (<FaHeart />) : (<FaRegHeart />)}
+            </span>
           </PostHeader>
           <PostImages>
             {post.feedImages &&
@@ -156,9 +178,6 @@ const MainFeedSection = ({ filter, posts }) => {
           <PostFooter>
             <div>Hashtags: {post.feedHashtags.join(", ")}</div>
             <div>Posted at: {new Date(post.created_at).toLocaleString()}</div>
-            <div className="like" onClick={() => onToggle(post)}>
-              {hearts.find((heart) => heart.postId === post.postId)?.isLiked ? <FaHeart /> : <FaRegHeart />}
-            </div>
           </PostFooter>
         </PostBlock>
       ))}

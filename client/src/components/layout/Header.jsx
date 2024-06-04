@@ -25,13 +25,6 @@ const Search = styled.div`
   display: flex;
   justify-content: space- between;
   align-items: center;
-  input {
-    border: 1px solid #e8ecf2;
-    font-size: 16px;
-    padding: 10px 20px;
-    max-width: 200px;
-    margin-left: 10px;
-  }
 `;
 
 const Like = styled.div`

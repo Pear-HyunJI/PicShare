@@ -21,6 +21,8 @@ const ProfileModifyBlock = styled.div`
     align-items: center;
 
     img {
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
     }
 
@@ -30,7 +32,10 @@ const ProfileModifyBlock = styled.div`
     }
   }
   .nickName{
-    
+    display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     input {
       text-align: center;
       width: 60%;
@@ -130,9 +135,9 @@ const ProfileModify = () => {
             <p>게시물</p>
             <p>팔로워</p>
             <p>팔로잉</p>
-            <Link to="/personalpage">
+            {/* <Link to="/personalpage/:userNo">
               <FiUpload />
-            </Link>
+            </Link> */}
           </div>
         </div>
         <div className="btn">

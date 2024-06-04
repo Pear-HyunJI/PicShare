@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import axios from "axios";
 import FollowButton from "../follow/FollowButton";
-
-
+import { fetchFollowerList, fetchFollowingList } from "@/store/follow";
 
 const ProfileSectionBlock = styled.div`
-margin: 100px;
+  margin: 100px;
   .profile {
     display: flex;
     justify-content: space-between;
@@ -18,49 +17,96 @@ margin: 100px;
       // margin:-50px;
     }
     img {
-      border-radius:50%;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
     }
   }
 `;
 
+// url으로 보낸 번호로 유저정보 가져와야 할거 같음
 
 const ProfileSection = () => {
-  const currentUserId = 1; // 로그인된 사용자 ID
-  const targetUserId = 2; // 팔로우할 대상 사용자 ID
+  const dispatch = useDispatch();
+  const { userNo } = useParams(); // URL에서 유저넘버 추출
+  const targetUserNo = parseInt(userNo); // URL에서 받아온 유저넘버
+  const currentUser = useSelector((state) => state.members.user);
+  const currentUserNo = currentUser.userNo;
+
+  const [user, setUser] = useState();
+  const [loading, setLoading] = useState(true);
 
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
 
-
-  const user = useSelector((state) => state.members.user);
-
+  useEffect(() => {
+    if (currentUserNo) {
+      dispatch(fetchFollowingList(currentUserNo));
+    }
+  }, [dispatch, currentUserNo]);
 
   useEffect(() => {
-    // 사용자 ID를 하드코딩하거나 로그인 정보를 가져와서 사용함
-    const userId = 1;
+    const fetchTargetUserData = (targetUserNo) => {
+      axios
+        .get(`http://localhost:8001/auth/users?targetUserNo=${targetUserNo}`)
+        .then((res) => {
+          const data = res.data;
+          setUser(data);
+          setLoading(false);
+        })
+        .catch((err) => console.log(err));
+    };
 
-    axios.get(`/followers/${userId}`)
-      .then(response => setFollowers(response.data))
-      .catch(error => console.error('Error fetching followers:', error));
+    fetchTargetUserData(targetUserNo);
 
-    // following도 비슷한 방식으로 fetch
-    // axios.get(`/following/${userId}`)
-    //   .then(response => setFollowing(response.data))
-    //   .catch(error => console.error('Error fetching following:', error));
-  }, []);
+    // 팔로워 목록 가져오기
+    dispatch(fetchFollowerList(targetUserNo)).then((response) => {
+      setFollowers(response);
+    });
 
+    console.log("팔로워 목록 가져오기", followers);
+
+    // 팔로잉 목록 가져오기
+    dispatch(fetchFollowingList(targetUserNo)).then((response) => {
+      setFollowing(response);
+    });
+
+    console.log("팔로잉 목록 가져오기", following);
+  }, [userNo, targetUserNo, dispatch]);
+
+  if (loading)
+    return (
+      <div>
+        {/* Loading...현재 페이지의 파라미터(타겟유저)는 {targetUserNo},
+        currentUser는
+        {currentUserNo} */}
+        로딩중
+      </div>
+    );
+
+  console.log("셋유저된 user", user);
 
   return (
     <ProfileSectionBlock>
       <div className="profile">
-      <img src={`http://localhost:8001/uploads/${user.profilePicture}`} alt="프로필사진" />
-      <p>게시물</p>
-      <p>팔로워</p>
-      <p>팔로잉</p>
-      <Link to="/profilemodify"><FaPen /></Link>
+        <img
+          src={`http://localhost:8001/uploads/${user[0].profilePicture}`}
+          alt="프로필사진"
+        />
+        <p>게시물</p>
+        <p>팔로워: {followers.length || 0}</p>
+        <p>팔로잉: {following.length || 0}</p>
+        {currentUserNo == targetUserNo && (
+        <Link to="/profilemodify">
+          <FaPen />
+        </Link>
+      )}
       </div>
+      
       <div className="btn">
-        <FollowButton userId={currentUserId} followerId={targetUserId}/>
+        {currentUserNo !== targetUserNo && (
+          <FollowButton userNo={targetUserNo} />
+        )}
       </div>
     </ProfileSectionBlock>
   );
