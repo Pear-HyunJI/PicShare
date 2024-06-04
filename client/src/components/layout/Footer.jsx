@@ -8,11 +8,13 @@ import { FaCirclePlus } from "react-icons/fa6";
 
 const FooterBlock = styled.div`
   padding: 15px;
-  margin-left: 150px;
+  // margin-left: 250px;
+  text-align: center;
   .menu {
     display: flex;
     justify-content: center;
     align-items: center;
+  
   }
 `;
 
@@ -32,7 +34,7 @@ const Profile = styled.div`
   img {
     margin-right: 10px;
     border-radius: 50%;
-    width: 16%;
+    width: 10%;
   }
 `;
 

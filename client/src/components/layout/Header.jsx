@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/PicShare.png";
-import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
+import { FaHeart, FaSearch } from "react-icons/fa";
 import { AiFillMessage } from "react-icons/ai";
 
 const HeaderBlock = styled.div`
@@ -54,7 +54,6 @@ const Header = () => {
           <Link to="/">
             <FaHeart />
           </Link>
-          {/* <FaRegHeart/> */}
         </Like>
         <Dm>
           <Link to="/">

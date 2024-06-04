@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
@@ -80,17 +80,86 @@ const PostImage = styled.img`
   display: inline-block;
 `;
 
-const MainFeedSection = ({ filter }) => {
+const MainFeedSection = ({ filter, posts }) => {
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
 
+  // 좋아요
+  const user = useSelector((state) => state.members.user);
+  const [hearts, setHearts] = useState([]);
+
   useEffect(() => {
+    // 피드 데이터를 가져오는 로직
     if (filter.type === "all") {
       dispatch(fetchAllFeed());
     } else if (filter.type === "following") {
       dispatch(fetchAllFeed(filter));
     }
-  }, [dispatch, filter]);
+
+    // 좋아요 데이터를 가져오는 로직
+    if (user) {
+      axios
+        .post("http://localhost:8001/other/post/likeList", {
+          userNo: user.userNo,
+        })
+        .then((res) => {
+          if (res.data) {
+            let initialHearts = posts.map((post) => ({
+              postId: post.id,
+              isLiked: 0,
+            }));
+            const updatedHearts = initialHearts.map((heart) => {
+              const dbHeart = res.data.find(
+                (item) => item.postId === heart.postId
+              );
+              return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
+            });
+            setHearts(updatedHearts);
+          } else {
+            console.log("좋아요 데이터를 가져오는데 실패했습니다.");
+          }
+        })
+        .catch((error) => {
+          console.error("좋아요 데이터를 가져오는 중 오류 발생:", error);
+        });
+    }
+  }, [dispatch, filter, user, posts]);
+
+  const onToggle = (postItem) => {
+    if (user) {
+      const updateHearts = hearts.map((heart) =>
+        heart.postId === postItem.id
+          ? { ...heart, isLiked: !heart.isLiked }
+          : heart
+      );
+      setHearts(updateHearts);
+      axios
+        .post("http://localhost:8001/other/post/likeToggle", {
+          post: postItem,
+          userNo: user.userNo,
+        })
+        .then((res) => {
+          if (res.data) {
+            console.log("좋아요 리스트 업데이트:", res.data);
+            setHearts(res.data);
+          } else {
+            console.log("좋아요 저장 실패");
+          }
+        })
+        .catch((error) => {
+          console.error("좋아요 저장 중 오류 발생:", error);
+          setHearts((prevHearts) =>
+            prevHearts.map((heart) =>
+              heart.postId === postItem.id
+                ? { ...heart, isLiked: !heart.isLiked }
+                : heart
+            )
+          );
+        });
+    } else {
+      alert("로그인해 주세요.");
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
