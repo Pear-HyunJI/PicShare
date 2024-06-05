@@ -64,6 +64,7 @@ const LikeButton = ({ postId }) => {
         .then((res) => {
           if (res.data) {
             setIsLiked((prev) => !prev);
+            dispatch(fetchLikeList());
           } else {
             console.log("좋아요 상태 변경 실패");
           }
