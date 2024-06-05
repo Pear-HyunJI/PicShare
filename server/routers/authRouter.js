@@ -198,4 +198,123 @@ authRouter.post("/refresh", (req, res) => {
   });
 });
 
+// 회원정보 수정(프로필사진,닉네임)
+// 회원정보 수정(프로필사진,닉네임)
+authRouter.put("/update", upload.single("photo"), (req, res) => {
+  const { userNickname } = req.body;
+  let photo = req.file ? req.file.filename : null; // 업데이트될 프로필 사진
+
+  let query;
+  let params;
+
+  if (photo) {
+    // 새로운 이미지가 업로드된 경우
+    query = `UPDATE users SET profilePicture = ? WHERE profilePicture = ?`;
+    params = [photo, userNickname]; // userNickname을 사용하여 해당하는 사용자의 프로필 사진을 업데이트
+  } else {
+    // 새로운 이미지가 업로드되지 않은 경우
+    query = `UPDATE users SET userNickname = ? WHERE userNickname = ?`;
+    params = [userNickname, userNickname]; // 기존의 userNickname을 사용하여 해당하는 사용자의 닉네임을 업데이트
+  }
+
+  db.query(query, params, (err, result) => {
+    if (err) {
+      if (err.code === "ER_DUP_ENTRY") {
+        return res.status(400).json({ message: "이미 존재하는 이메일입니다." });
+      } else {
+        return res
+          .status(500)
+          .json({ message: "서버 오류가 발생했습니다. 다시 시도해주세요." });
+      }
+    } else {
+      res.status(200).json({ affectedRows: result.affectedRows });
+    }
+  });
+});
+
+
+
+
+//회원탈퇴
+authRouter.delete("/delete", (req, res) => {
+  const { userNo } = req.query;
+
+  // 유저 삭제
+  db.query("DELETE FROM users WHERE userNo=?", [userNo], (err, userResult) => {
+    if (err) {
+      console.error("유저 삭제 중 에러:", err);
+      res.status(500).send("유저 삭제 실패");
+      return;
+    }
+
+    // 포스트 삭제
+    db.query(
+      "DELETE FROM posts WHERE userNo=?",
+      [userNo],
+      (err, postResult) => {
+        if (err) {
+          console.error("포스트 삭제 중 에러:", err);
+          res.status(500).send("포스트 삭제 실패");
+          return;
+        }
+
+        // 이미지 삭제
+        db.query(
+          "DELETE FROM images WHERE postId IN (SELECT postId FROM posts WHERE userNo=?)",
+          [userNo],
+          (err, imageResult) => {
+            if (err) {
+              console.error("이미지 삭제 중 에러:", err);
+              res.status(500).send("이미지 삭제 실패");
+              return;
+            }
+
+            // 해시태그 관계 삭제
+            db.query(
+              "DELETE FROM post_hashtags WHERE postId IN (SELECT postId FROM posts WHERE userNo=?)",
+              [userNo],
+              (err, hashtagResult) => {
+                if (err) {
+                  console.error("해시태그 관계 삭제 중 에러:", err);
+                  res.status(500).send("해시태그 관계 삭제 실패");
+                  return;
+                }
+
+                // 좋아요 정보 삭제
+                db.query(
+                  "DELETE FROM postlike WHERE postId IN (SELECT postId FROM posts WHERE userNo=?)",
+                  [userNo],
+                  (err, likeResult) => {
+                    if (err) {
+                      console.error("좋아요 정보 삭제 중 에러:", err);
+                      res.status(500).send("좋아요 정보 삭제 실패");
+                      return;
+                    }
+
+                    // 팔로우 관계 삭제
+                    db.query(
+                      "DELETE FROM follows WHERE followerId=? OR followeeId=?",
+                      [userNo, userNo],
+                      (err, followResult) => {
+                        if (err) {
+                          console.error("팔로우 관계 삭제 중 에러:", err);
+                          res.status(500).send("팔로우 관계 삭제 실패");
+                          return;
+                        }
+
+                        console.log("회원 및 관련 데이터 삭제 완료");
+                        res.send("회원 및 관련 데이터 삭제 완료");
+                      }
+                    );
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+});
+
 export default authRouter;

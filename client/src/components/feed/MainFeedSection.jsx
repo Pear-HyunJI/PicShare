@@ -8,6 +8,7 @@ import { fetchAllFeed } from "@/store/feed";
 import axios from "axios";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoMdMore } from "react-icons/io";
+import { AiFillMessage } from "react-icons/ai";
 
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
@@ -54,8 +55,16 @@ const PostHeader = styled.div`
   position: relative;
   .like {
     position: absolute;
-    right: ${({ isOwner }) => (isOwner ? "55px" : "10px")};
+    right: ${({ isOwner }) => (isOwner ? "80px" : "10px")};
     color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
+  .comment {
+    position: absolute;
+    right: ${({ isOwner }) => (isOwner ? "40px" : "10px")};
+    color: #000;
     cursor: pointer;
     z-index: 9999;
     font-size: 25px;
@@ -266,6 +275,7 @@ const MainFeedSection = ({ filter, posts }) => {
                   <FaRegHeart />
                 )}
               </span>
+              <span className="comment"><AiFillMessage/></span>
               {isOwner && (
                 <>
                   <span
