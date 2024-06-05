@@ -36,7 +36,7 @@ const MainFeedCategorySection = ({ setFilter, filter }) => {
     } else if (filterType === "following" && currentUser) {
       try {
         const response = await dispatch(fetchFollowingList(currentUser.userNo));
-        console.log("팔로잉피드 누렀을대 결과", response);
+        console.log("팔로잉피드 눌렀을때 결과", response);
         console.log(
           "팔로잉피드 눌렀을대 패치팔로잉리스트에 가져오는 유저넘버만!",
           response.map((user) => user.userNo)
