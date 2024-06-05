@@ -51,12 +51,12 @@ const Header = () => {
           </Link>
         </Search>
         <Like>
-          <Link to="/">
+          <Link to="/likelist">
             <FaHeart />
           </Link>
         </Like>
         <Dm>
-          <Link to="/">
+          <Link to="/commentlist">
             <AiFillMessage />
           </Link>
         </Dm>
