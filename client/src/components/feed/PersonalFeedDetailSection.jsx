@@ -35,33 +35,6 @@ const PersonalFeedDetailSectionBlock = styled.div`
       align-items: center;
       margin: 0 0 50px;
     }
-    .slidesection {
-      .slick-dots {
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translate(-50%);
-        li {
-          display: inline-block;
-          padding: 0 3.5px;
-          button {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            text-indent: -9999px;
-            overflow: hidden;
-          }
-          &.slick-active {
-            button {
-              width: 12px;
-              height: 12px;
-              background: #09dd52;
-            }
-          }
-        }
-      }
-    }
   }
   .slidesection {
     .slick-dots {
@@ -121,7 +94,6 @@ const PostFooter = styled.div`
 
 const SlideBlock = styled.div`
   width: 100%;
-  // height: ${({ height }) => height}px;
   height: 500px;
   background-color: #ddd;
   display: flex;
