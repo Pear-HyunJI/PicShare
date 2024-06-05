@@ -8,11 +8,12 @@ import FollowButton from "../follow/FollowButton";
 import { fetchFollowerList, fetchFollowingList } from "@/store/follow";
 
 const ProfileSectionBlock = styled.div`
-  margin: 100px;
+  margin: 100px 100px 80px 100px;
   .profile {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom:15px;
     p {
       // margin:-50px;
     }
@@ -27,11 +28,13 @@ const ProfileSectionBlock = styled.div`
       text-align: center;
     }
   }
+  .nickname {
+    margin-left:50px;
+    width: 100px;
+  }
   .modify {
-    // color: red;
-    // border: 1px solid red;
+    margin-left:15px;
     width: 150px;
-    text-align: right;
   }
 `;
 
@@ -101,7 +104,6 @@ const ProfileSection = ({ length }) => {
 
   return (
     <ProfileSectionBlock>
-      <div>{user[0].userNickname}</div>
       <div className="profile">
         <img
           src={`http://localhost:8001/uploads/${user[0].profilePicture}`}
@@ -120,13 +122,14 @@ const ProfileSection = ({ length }) => {
           <p>팔로잉</p>
         </div>
       </div>
-      <div className="modify">
+      <span className="nickname">{user[0].userNickname}</span>
+      <span className="modify">
         {currentUserNo == targetUserNo && (
           <Link to="/profilemodify">
             <FaPen />
           </Link>
         )}
-      </div>
+      </span>
       <div className="btn">
         {currentUserNo !== targetUserNo && (
           <FollowButton userNo={targetUserNo} />

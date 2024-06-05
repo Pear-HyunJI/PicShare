@@ -7,14 +7,14 @@ import { FaUserCheck, FaUserTimes } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 
 const FooterBlock = styled.div`
+  background:#000;
+  color:#fff;
   padding: 15px;
-  // margin-left: 250px;
-  text-align: center;
   .menu {
     display: flex;
     justify-content: center;
     align-items: center;
-  
+    text-align: center;
   }
 `;
 
@@ -25,16 +25,17 @@ const Loginout = styled.div`
 
 const Upload = styled.div`
   font-size: 30px;
-  margin-left: 20px;
+  margin: 0px 20px;
 `;
 
 const Profile = styled.div`
   font-size: 20px;
-  margin: 0 0 5px 20px;
+  margin-bottom: 5px;
   img {
     margin-right: 10px;
     border-radius: 50%;
-    width: 10%;
+    width: 30px;
+    height: 30px;
   }
 `;
 
