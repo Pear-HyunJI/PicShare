@@ -1,7 +1,9 @@
-import React, { useRef,useState } from "react";
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; //회원탈퇴 추가해주세여
+import { useSelector, useDispatch } from "react-redux"; // 회원탈퇴 추가
 import styled from "styled-components";
 import axios from "axios";
-
+import { fetchUsers } from "@/store/member"; //회원탈퇴 추가
 
 const ProfileModifyBlock = styled.div`
     max-width: 345px;
@@ -47,7 +49,7 @@ const ProfileModifyBlock = styled.div`
   .btn {
     margin-top: 20px 0;
     button {
-      margin-bottom: 50px;
+      margin-bottom: 20px;
       width: 88%;
       height: 40px;
       background: #ccc;
@@ -71,13 +73,24 @@ const ProfileModifyBlock = styled.div`
     font-size: 0.875rem;
     margin-top: 5px;
   }
-
-    
-
-  
+.delete {
+  button{
+    width: 88%;
+      height: 40px;
+      background: #f55;
+      color: #fff;
+      border-radius: 5px;
+      &:hover {
+        background: #f00;
+      }
+    }
+  }  
 `;
 
 const ProfileModify = () => {
+  const dispatch = useDispatch(); // 추가
+  const navigate = useNavigate(); // 추가
+
   const userNicknameRef = useRef();
   const [userInfo, setUserInfo] = useState({
     userNickname: "",
@@ -89,6 +102,8 @@ const ProfileModify = () => {
   const [profilePreview, setProfilePreview] = useState(
     "http://localhost:8001/uploads/defaultProfile.jpg"
   ); // 프로필프리뷰
+
+  const user = useSelector((state) => state.members.user);
 
 // 프로필프리뷰
 const handleCheckboxChange = () => {
@@ -111,7 +126,7 @@ const handleFileChange = (e) => {
   setProfilePreview(URL.createObjectURL(file)); // 사진을 등록하면 프로필프리뷰 변경
 };
 
-// 이메일, 닉네임 중복체크
+// 닉네임 중복체크
 const handleChange = async (e) => {
   const { value, name } = e.target;
   setUserInfo((userInfo) => ({ ...userInfo, [name]: value }));
@@ -150,8 +165,8 @@ const register = async (e) => {
   }
 
   try {
-    const res = await axios.post(
-      "http://localhost:8001/auth/join",
+    const res = await axios.put(
+      "http://localhost:8001/auth/update",
       formData,
       {
         headers: {
@@ -161,11 +176,12 @@ const register = async (e) => {
     );
     if (res.data.affectedRows === 1) {
       alert("회원수정이 완료되었습니다.");
-      navigate("/login");
+      navigate("/feed");
     } else {
       alert("회원수정이 실패했습니다.");
     }
   } catch (err) {
+    console.error("서버 오류:", err);
     if (err.response && err.response.data) {
       const { field, message } = err.response.data;
       setError((error) => ({ ...error, [field]: message }));
@@ -174,6 +190,33 @@ const register = async (e) => {
     }
   }
 };
+
+
+ // 회원탈퇴기능 추가
+ const handleDelete = (userNo) => {
+  console.log("탈퇴회원", userNo);
+  const confirmDelete = window.confirm(
+    "정말 회원 탈퇴를 하시겠습니까?\n\n" +
+      "회원 탈퇴 시, 귀하의 계정 및 모든 데이터가 영구적으로 삭제됩니다.\n"
+  );
+
+  if (confirmDelete) {
+    axios
+      .delete(`http://localhost:8001/auth/delete`, { params: { userNo } })
+      .then((res) => {
+        if (res) {
+          console.log(res.data);
+          dispatch(fetchUsers());
+          alert("회원탈퇴가 완료되었습니다.");
+          navigate("/login");
+        } else {
+          alert("삭제하지 못했습니다.");
+        }
+      })
+      .catch((err) => console.log(err));
+  }
+};
+
 
   return (
     <ProfileModifyBlock>
@@ -256,6 +299,11 @@ const register = async (e) => {
           <button type="submit">변경하기</button>
         </div>
       </form>
+       {/* 회원탈퇴버튼 추가 */}
+       <div className="delete">
+        <button onClick={() => handleDelete(user.userNo)}>회원탈퇴</button>
+      </div>
+
     </ProfileModifyBlock>
   );
 };
