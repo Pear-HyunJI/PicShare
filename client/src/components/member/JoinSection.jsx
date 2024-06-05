@@ -33,7 +33,8 @@ const JoinSectionBlock = styled.div`
       text-align: center;
       img {
         border-radius: 50%;
-        width: 30%;
+        width: 150px;
+      height: 150px;
       }
 
       .checkbox-label {
