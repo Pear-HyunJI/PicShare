@@ -94,7 +94,7 @@ const PostImage = styled.img`
   display: inline-block;
 `;
 
-const MainFeedSection = ({ filter, posts }) => {
+const MainFeedSection = ({ filter }) => {
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
 

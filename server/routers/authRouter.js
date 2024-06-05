@@ -141,23 +141,6 @@ authRouter.post("/remove", (req, res) => {
   });
 });
 
-//프로필사진수정기능
-// productRouter.post("/modify", upload.single("photo"), (req, res)=>{
-//   const {prNo, category, name, price, description, inventory} = req.body
-//   const photo = req.file
-//   const query = `UPDATE producttbl
-//                  SET category=?, name=?, price=?, description=?, inventory=?, photo=?
-//                  WHERE prNo=?`
-//   const queryparam = [category, name, price, description, inventory, photo.filename, prNo]
-//   db.query(query, queryparam, (err, result)=>{
-//       if (err) {
-//           res.status(500).send("상품정보 수정 실패");
-//           throw err
-//       } else {
-//           res.send(result)
-//       }
-//   })
-// });
 
 // all users 가져오기
 authRouter.get("/users", (req, res) => {

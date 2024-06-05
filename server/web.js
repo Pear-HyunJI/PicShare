@@ -34,6 +34,8 @@ app.use("/feed", feedRouter);
 app.use("/users", userprofileRouter);
 app.use("/follow", followRouter);
 app.use("/other", otherRouter);
+app.use("/likelist", otherRouter);
+
 
 // 지정한 포트에서 서버를 실행함
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
