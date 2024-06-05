@@ -23,7 +23,7 @@ otherRouter.post("/post/likeList", (req, res) => {
     LEFT JOIN images AS i ON p.postId = i.postId
     LEFT JOIN post_hashtags AS ph ON p.postId = ph.postId
     LEFT JOIN hashtags AS h ON ph.hashtagId = h.hashtagId
-    WHERE pl.userNo = ?
+    WHERE pl.userNo = ? AND pl.isLiked = 1
     GROUP BY p.postId
   `;
 

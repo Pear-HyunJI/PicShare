@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { FaHeart } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
+import { fetchLikeList } from "@/store/like";
+import LikeButton from "@/components/list/LikeButton";
 
 const LikeListBlock = styled.div`
   padding: 20px;
@@ -63,6 +64,15 @@ const PostHeader = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  position: relative;
+  .like {
+    position: absolute;
+    right: 10px;
+    color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
 `;
 
 const PostContent = styled.div`
@@ -95,35 +105,16 @@ const PostImage = styled.img`
 `;
 
 const LikeList = () => {
-  const [likeList, setLikeList] = useState([]);
+  const dispatch = useDispatch();
+  const likeList = useSelector((state) => state.likes.likeList);
   const user = useSelector((state) => state.members.user);
 
   useEffect(() => {
     if (user) {
-      axios
-        .post("http://localhost:8001/other/post/likeList", {
-          userNo: user.userNo,
-        })
-        .then((res) => {
-          if (res.data) {
-            // 이미지 URL을 배열로 변환
-            const postsWithImages = res.data.map((post) => ({
-              ...post,
-              imageUrls: post.imageUrls ? post.imageUrls.split(",") : [],
-            }));
-            setLikeList(postsWithImages);
-            console.log("라이크리스트", likeList);
-            console.log("라이크리스트", postsWithImages);
-          } else {
-            console.log("좋아요 데이터를 가져오는데 실패했습니다.");
-          }
-        })
-        .catch((error) => {
-          console.error("좋아요 데이터를 가져오는 중 오류 발생:", error);
-        });
+      dispatch(fetchLikeList(user.userNo));
+      console.log("라이크리스트", likeList);
     }
-    console.log("라이크리스트", likeList);
-  }, [user]);
+  }, [user, dispatch]);
 
   const sliderSettings = {
     dots: true,
@@ -160,6 +151,7 @@ const LikeList = () => {
               />
               <span>{post.userNickname}</span>
             </Link>
+            <LikeButton postId={post.postId} />
           </PostHeader>
           {post.imageUrls && post.imageUrls.length > 1 ? (
             <div className="slidesection">
@@ -199,16 +191,16 @@ const LikeList = () => {
               >
                 <PostImage
                   src={image}
-                  alt={`Post ${post.postId} Image`}
                   style={{
                     display: "inline-block",
                   }}
+                  alt={`Post ${post.postId} Image`}
                 />
               </SlideBlock>
             ))
           )}
           <PostContent>
-            <div className="hashtag"> {post.hashtags.replace(/,/g, " ")}</div>
+            <div className="hashtag">{post.hashtags.replace(/,/g, " ")}</div>
             <div className="content">{post.content}</div>
           </PostContent>
           <PostFooter>
