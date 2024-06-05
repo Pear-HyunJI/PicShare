@@ -2,29 +2,60 @@ import express from "express";
 import { db } from "../db.js";
 import dayjs from "dayjs";
 
-
 const otherRouter = express.Router();
-
 
 otherRouter.post("/post/likeList", (req, res) => {
   const userNo = req.body.userNo;
-  db.query(
-    `SELECT pl.*, p.content, i.imageUrl 
-     FROM postlike AS pl 
-     JOIN posts AS p ON pl.postId = p.postId 
-     LEFT JOIN images AS i ON pl.postId = i.postId 
-     WHERE pl.userNo = ?`, 
-    [userNo], 
-    (err, result) => {
-      if (err) {
-        console.error("에러", err);
-        res.status(500).send("실패");
-      } else {
-        res.send(result);
-      }
+
+  const query = `
+    SELECT 
+      p.postId, 
+      p.content, 
+      p.userNo, 
+      u.userNickname, 
+      u.profilePicture,
+      GROUP_CONCAT(i.imageUrl) AS imageUrls,
+      GROUP_CONCAT(h.tag) AS hashtags,
+      p.created_at
+    FROM postlike AS pl
+    JOIN posts AS p ON pl.postId = p.postId
+    JOIN users AS u ON p.userNo = u.userNo
+    LEFT JOIN images AS i ON p.postId = i.postId
+    LEFT JOIN post_hashtags AS ph ON p.postId = ph.postId
+    LEFT JOIN hashtags AS h ON ph.hashtagId = h.hashtagId
+    WHERE pl.userNo = ?
+    GROUP BY p.postId
+  `;
+
+  db.query(query, [userNo], (err, result) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+    } else {
+      res.send(result);
     }
-  );
+  });
 });
+
+// otherRouter.post("/post/likeList", (req, res) => {
+//   const userNo = req.body.userNo;
+//   db.query(
+//     `SELECT pl.*, p.content, i.imageUrl
+//      FROM postlike AS pl
+//      JOIN posts AS p ON pl.postId = p.postId
+//      LEFT JOIN images AS i ON pl.postId = i.postId
+//      WHERE pl.userNo = ?`,
+//     [userNo],
+//     (err, result) => {
+//       if (err) {
+//         console.error("에러", err);
+//         res.status(500).send("실패");
+//       } else {
+//         res.send(result);
+//       }
+//     }
+//   );
+// });
 
 // otherRouter.post("/post/likeList", (req, res) => {
 //   const userNo = req.body.userNo;
