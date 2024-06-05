@@ -12,6 +12,8 @@ import TagSearchDetailView from "@/views/TagSearchDetailView";
 import PersonalDetailFeedView from "@/views/PersonalDetailFeedView";
 import FollowingListView from "@/views/FollowingListView";
 import FollowerListView from "@/views/FollowerListView";
+import LikeListView from "@/views/LikeListView";
+import CommentListView from "@/views/CommentListView";
 
 const App = () => {
   return (
@@ -35,6 +37,8 @@ const App = () => {
           path="/personaldetailfeed/:postId"
           element={<PersonalDetailFeedView />}
         />
+        <Route path="/likelist" element={<LikeListView />} />
+        <Route path="/commentlist" element={<CommentListView />} />
       </Route>
     </Routes>
   );
