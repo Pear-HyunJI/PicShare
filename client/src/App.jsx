@@ -14,6 +14,7 @@ import FollowingListView from "@/views/FollowingListView";
 import FollowerListView from "@/views/FollowerListView";
 import LikeListView from "@/views/LikeListView";
 import CommentListView from "@/views/CommentListView";
+import FeedUpdateView from "@/views/FeedUpdateView";
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
         />
         <Route path="/likelist" element={<LikeListView />} />
         <Route path="/commentlist" element={<CommentListView />} />
+        <Route path="/feedupdate/:postId" element={<FeedUpdateView />} />
       </Route>
     </Routes>
   );

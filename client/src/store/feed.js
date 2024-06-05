@@ -22,11 +22,37 @@ const feedSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+    initPostByPostid(state, action) {
+      const post = action.payload;
+      const index = state.feeds.findIndex(
+        (feed) => feed.postId === post.postId
+      );
+      if (index === -1) {
+        state.feeds.push(post);
+      } else {
+        state.feeds[index] = post;
+      }
+      state.loading = false;
+    },
+    initUpdateFeed(state, action) {
+      const updatedPost = action.payload;
+      const index = state.feeds.findIndex(
+        (post) => post.postId === updatedPost.postId
+      );
+      if (index !== -1) {
+        state.feeds[index] = updatedPost;
+      }
+    },
   },
 });
 
-export const { initFeedStart, initFeedSuccess, initFeedFail } =
-  feedSlice.actions;
+export const {
+  initFeedStart,
+  initFeedSuccess,
+  initFeedFail,
+  initUpdateFeed,
+  initPostByPostid,
+} = feedSlice.actions;
 
 export const fetchAllFeed = (filter) => (dispatch) => {
   dispatch(initFeedStart());
@@ -70,6 +96,31 @@ export const fetchAllFeed = (filter) => (dispatch) => {
       dispatch(initFeedSuccess(data));
     })
     .catch((err) => dispatch(initFeedFail(err)));
+};
+
+export const fetchPostByPostid = (postId) => (dispatch) => {
+  dispatch(initFeedStart());
+  axios
+    .get(`http://localhost:8001/feed/postbypostid?postId=${postId}`)
+    .then((res) => {
+      const post = res.data;
+      console.log("포스트바이아이디", post);
+      dispatch(initPostByPostid(post));
+    })
+    .catch((err) => {
+      dispatch(initFeedFail(err));
+    });
+};
+
+export const updateFeed = (postId, updatedData) => (dispatch) => {
+  axios
+    .put(`http://localhost:8001/feed/update?postId=${postId}`, updatedData)
+    .then((res) => {
+      const updatedPost = res.data;
+      console.log("업데이트 데이터", updatedPost);
+      dispatch(initUpdateFeed(updatedPost));
+    })
+    .catch((err) => console.log(err));
 };
 
 export default feedSlice.reducer;

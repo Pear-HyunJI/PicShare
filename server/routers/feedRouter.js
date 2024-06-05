@@ -220,4 +220,269 @@ feedRouter.get("/all", (req, res) => {
   });
 });
 
+// postid에 따른 포스트 가져옴
+feedRouter.get("/postbypostid", (req, res) => {
+  const { postId } = req.query;
+  db.query(
+    `SELECT * FROM posts WHERE postId = ?`,
+    [postId],
+    (err, postResult) => {
+      if (err) {
+        console.log(err);
+        return res.json({
+          message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+        });
+      }
+      const post = postResult[0];
+
+      db.query(
+        `SELECT * FROM images WHERE postId = ?`,
+        [postId],
+        (err, imageResult) => {
+          if (err) {
+            console.log(err);
+            return res.json({
+              message: "피드의 이미지를 가져오던 중 오류가 발생했습니다.",
+            });
+          }
+          post.images = imageResult;
+
+          db.query(
+            `SELECT h.tag FROM hashtags h
+            JOIN post_hashtags ph ON h.hashtagId = ph.hashtagId
+            WHERE ph.postId = ?`,
+            [postId],
+            (err, hashtagResult) => {
+              if (err) {
+                console.log(err);
+                return res.json({
+                  message: "피드의 해시태그를 가져오던 중 오류가 발생했습니다.",
+                });
+              }
+              post.hashtags = hashtagResult.map((row) => row.tag);
+              res.json(post);
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+// 피드 업데이트
+feedRouter.put("/update/:postId", upload.array("images", 10), (req, res) => {
+  const { postId } = req.params;
+  const { content, hashtags, scheduled_at } = req.body;
+  const files = req.files;
+
+  db.getConnection((err, connection) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+      return;
+    }
+
+    connection.beginTransaction((err) => {
+      if (err) {
+        console.error("에러", err);
+        res.status(500).send("실패");
+        connection.release();
+        return;
+      }
+
+      connection.query(
+        `UPDATE posts SET content = ?, scheduled_at = ?, updated_at = ? WHERE postId = ?`,
+        [content, scheduled_at || null, new Date(), postId],
+        (err, result) => {
+          if (err) {
+            return connection.rollback(() => {
+              connection.release();
+              res.send(err);
+            });
+          }
+
+          if (files.length > 0) {
+            connection.query(
+              `DELETE FROM images WHERE postId = ?`,
+              [postId],
+              (err) => {
+                if (err) {
+                  return connection.rollback(() => {
+                    connection.release();
+                    res.send(err);
+                  });
+                }
+
+                const imageInsertPromises = files.map((file) => {
+                  const imageUrl = `http://localhost:8001/uploads/${file.filename}`;
+                  return new Promise((resolve, reject) => {
+                    connection.query(
+                      `INSERT INTO images (postId, imageUrl) VALUES (?, ?)`,
+                      [postId, imageUrl],
+                      (err, imagefiledata) => {
+                        if (err) {
+                          reject(err);
+                        } else {
+                          resolve();
+                        }
+                      }
+                    );
+                  });
+                });
+
+                Promise.all(imageInsertPromises)
+                  .then(() => {
+                    // 이미지 추가 완료
+                    const hashtagArray = hashtags
+                      .split(" ")
+                      .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
+
+                    connection.query(
+                      `DELETE FROM post_hashtags WHERE postId = ?`,
+                      [postId],
+                      (err) => {
+                        if (err) {
+                          return connection.rollback(() => {
+                            connection.release();
+                            res.send(err);
+                          });
+                        }
+
+                        const hashtagInsertPromises = hashtagArray.map(
+                          (tag) => {
+                            return new Promise((resolve, reject) => {
+                              connection.query(
+                                `INSERT IGNORE INTO hashtags (tag) VALUES (?)`,
+                                [tag],
+                                (err, result) => {
+                                  if (err) {
+                                    reject(err);
+                                  } else {
+                                    const hashtagId = result.insertId;
+                                    connection.query(
+                                      `INSERT INTO post_hashtags (postId, hashtagId) VALUES (?, ?)`,
+                                      [postId, hashtagId],
+                                      (err) => {
+                                        if (err) {
+                                          reject(err);
+                                        } else {
+                                          resolve();
+                                        }
+                                      }
+                                    );
+                                  }
+                                }
+                              );
+                            });
+                          }
+                        );
+
+                        Promise.all(hashtagInsertPromises)
+                          .then(() => {
+                            // 해시태그 추가 완료
+                            connection.commit((err) => {
+                              if (err) {
+                                return connection.rollback(() => {
+                                  connection.release();
+                                  res.send(err);
+                                });
+                              }
+                              connection.release();
+                              res.send({
+                                message: "피드가 성공적으로 수정되었습니다.",
+                              });
+                            });
+                          })
+                          .catch((err) => {
+                            connection.rollback(() => {
+                              connection.release();
+                              res.send(err);
+                            });
+                          });
+                      }
+                    );
+                  })
+                  .catch((err) => {
+                    connection.rollback(() => {
+                      connection.release();
+                      res.send(err);
+                    });
+                  });
+              }
+            );
+          } else {
+            connection.commit((err) => {
+              if (err) {
+                return connection.rollback(() => {
+                  connection.release();
+                  res.status(500).send(err);
+                });
+              }
+              connection.release();
+              res.send({ message: "피드가 성공적으로 수정되었습니다." });
+            });
+          }
+        }
+      );
+    });
+  });
+});
+
+// 피드 삭제
+feedRouter.delete("/delete", (req, res) => {
+  const { postId } = req.query;
+  console.log("포스트아이디", postId);
+
+  // 피드 삭제
+  db.query("DELETE FROM posts WHERE postId=?", [postId], (err, postResult) => {
+    if (err) {
+      console.error("포스트 삭제 중 에러:", err);
+      res.status(500).send("포스트 삭제 실패");
+      return;
+    }
+
+    // 이미지 삭제
+    db.query(
+      "DELETE FROM images WHERE postId=?",
+      [postId],
+      (err, imageResult) => {
+        if (err) {
+          console.error("이미지 삭제 중 에러:", err);
+          res.status(500).send("이미지 삭제 실패");
+          return;
+        }
+
+        // 해시태그 관계 삭제
+        db.query(
+          "DELETE FROM post_hashtags WHERE postId=?",
+          [postId],
+          (err, hashtagResult) => {
+            if (err) {
+              console.error("해시태그 관계 삭제 중 에러:", err);
+              res.status(500).send("해시태그 관계 삭제 실패");
+              return;
+            }
+
+            // 좋아요 정보 삭제
+            db.query(
+              "DELETE FROM postlike WHERE postId=?",
+              [postId],
+              (err, likeResult) => {
+                if (err) {
+                  console.error("좋아요 정보 삭제 중 에러:", err);
+                  res.status(500).send("좋아요 정보 삭제 실패");
+                  return;
+                }
+
+                console.log("포스트 및 관련 데이터 삭제 완료");
+                res.send("포스트 및 관련 데이터 삭제 완료");
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+});
+
 export default feedRouter;

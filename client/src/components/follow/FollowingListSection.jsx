@@ -33,9 +33,39 @@ const FollowingListSectionBlock = styled.div`
       margin: 0 0 50px;
     }
   }
+  .followingListWrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .empty {
+    padding: 50px 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+  }
 `;
 
-const FollowingList = styled.div``;
+const FollowingList = styled.div`
+  flex: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+
+  margin: 20px 10px 30px;
+  .imageBox {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    flex: 50%;
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+  }
+`;
 
 const FollowingListSection = () => {
   const navigate = useNavigate();
@@ -48,7 +78,6 @@ const FollowingListSection = () => {
     navigate(-1);
   };
 
-  if (!following.length) return <div>Loading...</div>;
   return (
     <FollowingListSectionBlock>
       <div className="top">
@@ -56,24 +85,37 @@ const FollowingListSection = () => {
           <button onClick={handleBack}>
             <IoIosArrowBack />
           </button>
-          <h2>팔로잉리스트</h2>
+          <h2>팔로잉 목록</h2>
         </div>
         <div className="num">
-          <span>팔로잉 {following.length}명</span>
+          {!following.length ? (
+            <span>팔로잉 0 명</span>
+          ) : (
+            <span>팔로잉 {following.length}명</span>
+          )}
         </div>
       </div>
-      {following.map((user) => (
-        <FollowingList key={user.userNo}>
-          <Link to={`/personalpage/${user.userNo}`} className="imageBox">
-            <img
-              src={`http://localhost:8001/uploads/${user.profilePicture}`}
-              alt={user.userNickname}
-            />
-            <span>@{user.userNickname}</span>
-          </Link>
-          <FollowButton userNo={user.userNo} />
-        </FollowingList>
-      ))}
+      {!following.length ? (
+        <div className="empty">
+          <p>아직 팔로잉한 사람이 없습니다.</p>
+          <p>새로운 사람들을 팔로우하고 소식을 받아보세요!</p>
+        </div>
+      ) : (
+        <div className="followingListWrap">
+          {following.map((user) => (
+            <FollowingList key={user.userNo}>
+              <Link to={`/personalpage/${user.userNo}`} className="imageBox">
+                <img
+                  src={`http://localhost:8001/uploads/${user.profilePicture}`}
+                  alt={user.userNickname}
+                />
+                <span>@{user.userNickname}</span>
+              </Link>
+              <FollowButton userNo={user.userNo} />
+            </FollowingList>
+          ))}
+        </div>
+      )}
     </FollowingListSectionBlock>
   );
 };

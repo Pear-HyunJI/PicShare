@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import Slider from "react-slick";
@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick.css";
 import { fetchAllFeed } from "@/store/feed";
 import axios from "axios";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { IoMdMore } from "react-icons/io";
 
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
@@ -50,17 +51,21 @@ const PostHeader = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
   position: relative;
   .like {
     position: absolute;
-    right: 10px;
+    right: ${({ isOwner }) => (isOwner ? "55px" : "10px")};
     color: #f00;
     cursor: pointer;
     z-index: 9999;
     font-size: 25px;
+  }
+  .addfunction {
+    position: absolute;
+    right: 3px;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 35px;
   }
 `;
 
@@ -80,7 +85,6 @@ const PostFooter = styled.div`
 
 const SlideBlock = styled.div`
   width: 100%;
-  // height: ${({ height }) => height}px;
   height: 500px;
   background-color: #ddd;
   display: flex;
@@ -94,12 +98,35 @@ const PostImage = styled.img`
   display: inline-block;
 `;
 
-const MainFeedSection = ({ filter }) => {
+const EditDeleteButtons = styled.div`
+  z-index: 1000;
+  position: absolute;
+  top: 40px;
+  right: 3px;
+  display: flex;
+  flex-direction: column;
+  button {
+    margin: 2px 0;
+    padding: 5px 10px;
+    background: #09dd52;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+      background: #07b345;
+    }
+  }
+`;
+
+const MainFeedSection = ({ filter, posts }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
+  const user = useSelector((state) => state.members.user);
+  const [hearts, setHearts] = useState([]);
+  const [showEditDelete, setShowEditDelete] = useState({});
 
   useEffect(() => {
-    // 피드 데이터를 가져오는 로직
     if (filter.type === "all") {
       dispatch(fetchAllFeed());
     } else if (filter.type === "following") {
@@ -107,11 +134,6 @@ const MainFeedSection = ({ filter }) => {
     }
   }, [filter]);
 
-  // 좋아요
-  const user = useSelector((state) => state.members.user);
-  const [hearts, setHearts] = useState([]);
-
-  // 좋아요 데이터를 가져오는 로직
   useEffect(() => {
     if (user) {
       axios
@@ -124,10 +146,6 @@ const MainFeedSection = ({ filter }) => {
               postId: post.postId,
               isLiked: post.isLiked,
             }));
-            // const updatedHearts = initialHearts.map((heart) => {
-            //   const dbHeart = res.data.find((item) => item.postId === heart.postId);
-            //   return dbHeart ? { ...heart, isLiked: dbHeart.isLiked } : heart;
-            // });
             setHearts(initialHearts);
           } else {
             console.log("좋아요 데이터를 가져오는데 실패했습니다.");
@@ -175,6 +193,32 @@ const MainFeedSection = ({ filter }) => {
     }
   };
 
+  const toggleEditDelete = (postId) => {
+    setShowEditDelete((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
+  const handleDelete = (postId) => {
+    console.log("삭제 포스트아이디", postId);
+    const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
+    if (confirmDelete) {
+      axios
+        .delete(`http://localhost:8001/feed/delete`, { params: { postId } })
+        .then((res) => {
+          if (res.data === "포스트 및 관련 데이터 삭제 완료") {
+            console.log(res.data);
+            dispatch(fetchAllFeed());
+          } else {
+            alert("삭제하지 못했습니다.");
+            return;
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -196,9 +240,11 @@ const MainFeedSection = ({ filter }) => {
   return (
     <MainFeedSectionBlock>
       {filteredFeeds.map((post, index) => {
+        const isOwner = user && post.userNo === user.userNo;
+
         return (
           <PostBlock key={post.postId}>
-            <PostHeader>
+            <PostHeader isOwner={isOwner}>
               <Link to={`/personalpage/${post.userNo}`}>
                 <img
                   src={`http://localhost:8001/uploads/${post.profilePicture}`}
@@ -220,6 +266,26 @@ const MainFeedSection = ({ filter }) => {
                   <FaRegHeart />
                 )}
               </span>
+              {isOwner && (
+                <>
+                  <span
+                    className="addfunction"
+                    onClick={() => toggleEditDelete(post.postId)}
+                  >
+                    <IoMdMore />
+                  </span>
+                  {showEditDelete[post.postId] && (
+                    <EditDeleteButtons>
+                      <Link to={`/feedupdate/${post.postId}`}>
+                        <button>수정</button>
+                      </Link>
+                      <button onClick={() => handleDelete(post.postId)}>
+                        삭제
+                      </button>
+                    </EditDeleteButtons>
+                  )}
+                </>
+              )}
             </PostHeader>
             {post.feedImages && post.feedImages.length > 1 ? (
               <div className="slidesection">

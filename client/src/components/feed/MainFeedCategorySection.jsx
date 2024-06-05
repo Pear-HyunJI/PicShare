@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { fetchFollowingList } from "@/store/follow"; // 팔로잉 리스트 가져오는 액션 추가
+import { fetchFollowingList } from "@/store/follow";
 
 const MainFeedCategorySectionBlock = styled.div`
   display: flex;
