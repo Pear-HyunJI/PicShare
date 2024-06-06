@@ -141,7 +141,6 @@ authRouter.post("/remove", (req, res) => {
   });
 });
 
-
 // all users 가져오기
 authRouter.get("/users", (req, res) => {
   const { targetUserNo } = req.query;
@@ -197,43 +196,6 @@ authRouter.post("/refresh", (req, res) => {
     }
   });
 });
-
-// 회원정보 수정(프로필사진,닉네임)
-// 회원정보 수정(프로필사진,닉네임)
-authRouter.put("/update", upload.single("photo"), (req, res) => {
-  const { userNickname } = req.body;
-  let photo = req.file ? req.file.filename : null; // 업데이트될 프로필 사진
-
-  let query;
-  let params;
-
-  if (photo) {
-    // 새로운 이미지가 업로드된 경우
-    query = `UPDATE users SET profilePicture = ? WHERE profilePicture = ?`;
-    params = [photo, userNickname]; // userNickname을 사용하여 해당하는 사용자의 프로필 사진을 업데이트
-  } else {
-    // 새로운 이미지가 업로드되지 않은 경우
-    query = `UPDATE users SET userNickname = ? WHERE userNickname = ?`;
-    params = [userNickname, userNickname]; // 기존의 userNickname을 사용하여 해당하는 사용자의 닉네임을 업데이트
-  }
-
-  db.query(query, params, (err, result) => {
-    if (err) {
-      if (err.code === "ER_DUP_ENTRY") {
-        return res.status(400).json({ message: "이미 존재하는 이메일입니다." });
-      } else {
-        return res
-          .status(500)
-          .json({ message: "서버 오류가 발생했습니다. 다시 시도해주세요." });
-      }
-    } else {
-      res.status(200).json({ affectedRows: result.affectedRows });
-    }
-  });
-});
-
-
-
 
 //회원탈퇴
 authRouter.delete("/delete", (req, res) => {
@@ -315,6 +277,195 @@ authRouter.delete("/delete", (req, res) => {
       }
     );
   });
+});
+
+// 프로필사진 및 닉네임 수정 기능
+// authRouter.put("/update-profile", upload.single("photo"), (req, res) => {
+//   const { userNo, userNickname, currentPassword, newPassword } = req.body;
+//   const photo = req.file ? req.file.filename : "defaultProfile.jpg";
+//   console.log("서버 포토", photo);
+
+//   // 닉네임만
+//   if (!photo) {
+//     db.query(
+//       `UPDATE users SET userNickname = ? WHERE userNo = ?`,
+//       [userNickname, userNo],
+//       (err, result) => {
+//         if (err) {
+//           return res.status(500).json({
+//             message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//           });
+//         }
+//         res.status(200).json({ affectedRows: result.affectedRows });
+//       }
+//     );
+//   }
+
+//   // 프로필 사진과 닉네임
+//   db.query(
+//     `UPDATE users SET profilePicture = ?, userNickname = ? WHERE userNo = ?`,
+//     [photo, userNickname, userNo],
+//     (err, result1) => {
+//       if (err) {
+//         return res.status(500).json({
+//           message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//         });
+//       }
+//       res.status(200).json({ affectedRows: result1.affectedRows });
+//     }
+//   );
+
+//   // 비밀번호를 변경할 떼
+//   if (newPassword) {
+//     // 현재 비밀번호 확인
+//     db.query(
+//       "SELECT * FROM users WHERE userNo = ?",
+//       [userNo],
+//       (err, results) => {
+//         if (err) {
+//           return res.status(500).json({
+//             message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//           });
+//         }
+//         const user = results[0];
+//         if (user.password !== currentPassword) {
+//           return res.status(400).json({
+//             field: "currentPassword",
+//             message: "현재 비밀번호가 일치하지 않습니다.",
+//           });
+//         }
+
+//         // 새로운 비밀번호로 업데이트
+//         db.query(
+//           "UPDATE users SET password = ? WHERE userNo = ?",
+//           [newPassword, userNo],
+//           (err, results) => {
+//             if (err) {
+//               return res.status(500).json({
+//                 message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//               });
+//             }
+//             res.status(200).json({ affectedRows: results.affectedRows });
+//           }
+//         );
+//       }
+//     );
+//   }
+// });
+
+// 비밀번호 변경 기능
+// authRouter.put("/update-password", (req, res) => {
+//   const { currentPassword, newPassword } = req.body;
+
+//   // 현재 비밀번호 확인
+//   db.query(
+//     "SELECT * FROM users WHERE userNo = ?",
+//     [req.body.userNo],
+//     (err, results) => {
+//       if (err) {
+//         return res.status(500).json({
+//           message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//         });
+//       }
+//       const user = results[0];
+//       if (user.password !== currentPassword) {
+//         return res.status(400).json({
+//           field: "currentPassword",
+//           message: "현재 비밀번호가 일치하지 않습니다.",
+//         });
+//       }
+
+//       // 새로운 비밀번호로 업데이트
+//       db.query(
+//         "UPDATE users SET password = ? WHERE userNo = ?",
+//         [newPassword, req.body.userNo],
+//         (err, result) => {
+//           if (err) {
+//             return res.status(500).json({
+//               message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+//             });
+//           }
+//           res.status(200).json({ affectedRows: result.affectedRows });
+//         }
+//       );
+//     }
+//   );
+// });
+
+authRouter.put("/update-profile", upload.single("photo"), (req, res) => {
+  const { userNo, userNickname, currentPassword, newPassword } = req.body;
+  const photo = req.file ? req.file.filename : null;
+
+  // 닉네임과 프로필 사진 업데이트
+  if (photo || userNickname) {
+    let updateQuery = "UPDATE users SET";
+    let queryParams = [];
+
+    if (photo) {
+      updateQuery += " profilePicture = ?";
+      queryParams.push(photo);
+    }
+
+    if (userNickname) {
+      if (queryParams.length > 0) updateQuery += ",";
+      updateQuery += " userNickname = ?";
+      queryParams.push(userNickname);
+    }
+
+    updateQuery += " WHERE userNo = ?";
+    queryParams.push(userNo);
+
+    db.query(updateQuery, queryParams, (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+        });
+      }
+      if (newPassword) {
+        updatePassword();
+      } else {
+        res.status(200).json({ affectedRows: result.affectedRows });
+      }
+    });
+  } else if (newPassword) {
+    updatePassword();
+  }
+
+  function updatePassword() {
+    // 현재 비밀번호 확인
+    db.query(
+      "SELECT * FROM users WHERE userNo = ?",
+      [userNo],
+      (err, results) => {
+        if (err) {
+          return res.status(500).json({
+            message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+          });
+        }
+        const user = results[0];
+        if (user.password !== currentPassword) {
+          return res.status(400).json({
+            field: "currentPassword",
+            message: "현재 비밀번호가 일치하지 않습니다.",
+          });
+        }
+
+        // 새로운 비밀번호로 업데이트
+        db.query(
+          "UPDATE users SET password = ? WHERE userNo = ?",
+          [newPassword, userNo],
+          (err, results) => {
+            if (err) {
+              return res.status(500).json({
+                message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
+              });
+            }
+            res.status(200).json({ affectedRows: results.affectedRows });
+          }
+        );
+      }
+    );
+  }
 });
 
 export default authRouter;

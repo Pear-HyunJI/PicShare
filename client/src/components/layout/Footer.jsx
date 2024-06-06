@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { userLogout } from "@/store/member";
 import { FaUserCheck, FaUserTimes } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
+// import { fecthUsers } from "@/store/member";
 
 const FooterBlock = styled.div`
-  background:#000;
-  color:#fff;
+  background: #000;
+  color: #fff;
   padding: 15px;
   .menu {
     display: flex;
@@ -43,6 +44,8 @@ const Footer = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.members.user);
+
+  // useEffect(dispatch(fecthUsers(user.userNo)));
 
   const handleLogout = (e) => {
     e.preventDefault();
