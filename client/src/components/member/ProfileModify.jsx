@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import axios from "axios";
-import { fetchUsers } from "@/store/member";
+import { fetchUsers, userLogout } from "@/store/member";
 
 const ProfileModifyBlock = styled.div`
   max-width: 345px;
@@ -228,8 +228,12 @@ const ProfileModify = () => {
         }
       );
       if (res.data.affectedRows >= 1) {
-        alert("회원수정이 완료되었습니다.");
-        navigate(-1);
+        // 정보 수정후에 푸터랑 회원정보창의 정보가 업데이트가 바로 안됨
+        alert(
+          "회원정보가 수정되었습니다. 변경 사항을 적용하려면 로그아웃 후 다시 로그인해 주세요"
+        );
+        dispatch(userLogout(user.userNo));
+        navigate("/login");
       } else {
         alert("회원수정이 실패했습니다.");
       }

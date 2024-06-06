@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { IoIosArrowBack } from "react-icons/io";
@@ -7,7 +8,6 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import { IoMdMore } from "react-icons/io";
 import { fetchAllFeed } from "@/store/feed";
-import { useDispatch } from "react-redux";
 import axios from "axios";
 
 const PersonalFeedDetailSectionBlock = styled.div`
@@ -155,6 +155,7 @@ const PersonalFeedDetailSection = () => {
   const navigate = useNavigate();
   const { filteredFeeds } = location.state || { filteredFeeds: [] };
   const [showEditDelete, setShowEditDelete] = useState({});
+  const user = useSelector((state) => state.members.user);
 
   const postIndex = filteredFeeds.findIndex(
     (feed) => feed.postId === parseInt(postId)
@@ -230,24 +231,26 @@ const PersonalFeedDetailSection = () => {
               />
               <span>{post.userNickname}</span>
             </Link>
-            <div>
-              <span
-                className="addfunction"
-                onClick={() => toggleEditDelete(post.postId)}
-              >
-                <IoMdMore />
-              </span>
-              {showEditDelete[post.postId] && (
-                <EditDeleteButtons>
-                  <Link to={`/feedupdate/${post.postId}`}>
-                    <button>수정</button>
-                  </Link>
-                  <button onClick={() => handleDelete(post.postId)}>
-                    삭제
-                  </button>
-                </EditDeleteButtons>
-              )}
-            </div>
+            {user.userNo === post.userNo && (
+              <div>
+                <span
+                  className="addfunction"
+                  onClick={() => toggleEditDelete(post.postId)}
+                >
+                  <IoMdMore />
+                </span>
+                {showEditDelete[post.postId] && (
+                  <EditDeleteButtons>
+                    <Link to={`/feedupdate/${post.postId}`}>
+                      <button>수정</button>
+                    </Link>
+                    <button onClick={() => handleDelete(post.postId)}>
+                      삭제
+                    </button>
+                  </EditDeleteButtons>
+                )}
+              </div>
+            )}
           </PostHeader>
           {post.feedImages && post.feedImages.length > 1 ? (
             <div className="slidesection">
