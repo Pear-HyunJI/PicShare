@@ -394,7 +394,7 @@ authRouter.delete("/delete", (req, res) => {
 
 authRouter.put("/update-profile", upload.single("photo"), (req, res) => {
   const { userNo, userNickname, currentPassword, newPassword } = req.body;
-  const photo = req.file ? req.file.filename : null;
+  const photo = req.file ? req.file.filename : "defaultProfile.jpg";
 
   // 닉네임과 프로필 사진 업데이트
   if (photo || userNickname) {
