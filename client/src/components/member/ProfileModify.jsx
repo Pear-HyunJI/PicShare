@@ -7,17 +7,23 @@ import { fetchUsers } from "@/store/member";
 
 const ProfileModifyBlock = styled.div`
   max-width: 345px;
-  margin: 100px auto;
+  margin: 50px auto;
   text-align: center;
   .setting {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     font-size: 30px;
   }
   table {
     width: 100%;
-    td {
+    .modify {
+      font-weight: bold;
+      text-align: left;
       padding: 20px;
+      // color: red;
+    }
+    td {
+      padding: 5px 20px;
       text-align: center;
       img {
         border-radius: 50%;
@@ -46,7 +52,7 @@ const ProfileModifyBlock = styled.div`
     }
   }
   .btn {
-    margin-top: 20px;
+    margin-top: 50px;
     button {
       margin-bottom: 20px;
       width: 88%;
@@ -59,7 +65,7 @@ const ProfileModifyBlock = styled.div`
       }
     }
     .textColor {
-      color: #09fc52;
+      color: #fff;
     }
   }
   .error {
@@ -299,7 +305,14 @@ const ProfileModify = () => {
             </tr>
             <tr>
               <td>
-                <span>닉네임을 변경하시겠습니까?</span>
+                <label className="checkbox-label">이메일</label>
+                <input type="text" value={user.email} disabled />
+              </td>
+            </tr>
+            <p className="modify">* 닉네임 변경하기</p>
+            <tr>
+              <td>
+                <label className="checkbox-label">새 닉네임 입력</label>
                 <input
                   type="text"
                   ref={userNicknameRef}
@@ -316,12 +329,15 @@ const ProfileModify = () => {
                 )}
               </td>
             </tr>
+            <p className="modify">* 비밀번호 변경하기</p>
+
             <tr>
               <td>
+                <label className="checkbox-label">현재 비밀번호 입력</label>
                 <input
                   type="password"
                   name="currentPassword"
-                  placeholder="현재 비밀번호"
+                  placeholder="현재 비밀번호를 입력해주세요."
                   value={userInfo.currentPassword}
                   onChange={handleChange}
                 />
@@ -330,12 +346,14 @@ const ProfileModify = () => {
                 )}
               </td>
             </tr>
+
             <tr>
               <td>
+                <label className="checkbox-label">새 비밀번호 입력</label>
                 <input
                   type="password"
                   name="newPassword"
-                  placeholder="변경할 비밀번호"
+                  placeholder="변경할 비밀번호을 입력해주세요."
                   value={userInfo.newPassword}
                   onChange={handleChange}
                 />
@@ -345,7 +363,7 @@ const ProfileModify = () => {
         </table>
         <div className="btn">
           <button type="submit">
-            <span className="textColor">회</span>원정보 수정
+            <span className="textColor">회원정보 수정</span>
           </button>
         </div>
       </form>
