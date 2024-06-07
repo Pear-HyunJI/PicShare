@@ -71,6 +71,26 @@ const FeedUpdateSectionBlock = styled.form`
       padding: 5px 10px;
     }
   }
+
+  .images {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    .imagewrap {
+      img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+      }
+    }
+    .lengthwrap {
+      span {
+        font-size: 20px;
+        color: #aaa;
+      }
+    }
+  }
 `;
 
 const FeedUpdateSection = () => {
@@ -79,19 +99,18 @@ const FeedUpdateSection = () => {
   const { postId } = useParams();
   const [content, setContent] = useState("");
   const [hashtags, setHashtags] = useState([]);
+  const [photo, setPhoto] = useState([]);
 
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const response = await axios.get(
-          `${serverUrl}/feed/postbypostid`,
-          {
-            params: { postId },
-          }
-        );
+        const response = await axios.get(`${serverUrl}/feed/postbypostid`, {
+          params: { postId },
+        });
         const post = response.data;
         setContent(post.content);
         setHashtags(post.hashtags);
+        setPhoto(post.images);
       } catch (err) {
         console.error(err);
       }
@@ -133,6 +152,16 @@ const FeedUpdateSection = () => {
             <IoIosArrowBack />
           </button>
           <h2>게시물 수정</h2>
+        </div>
+        <div className="images">
+          <div className="imagewrap">
+            {photo.slice(0, 3).map((file, idx) => (
+              <img key={idx} src={file.imageUrl} alt="upload preview" />
+            ))}
+          </div>
+          <div className="lengthwrap">
+            {photo.length > 3 && <span>+{photo.length - 3} more</span>}
+          </div>
         </div>
         <textarea
           placeholder="피드 내용을 입력하세요..."
