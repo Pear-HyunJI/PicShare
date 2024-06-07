@@ -41,15 +41,6 @@ const MainFeedSectionBlock = styled.div`
       }
     }
   }
-  .like {
-    margin-top: 30px;
-    position: absolute;
-    left: 20px;
-    color: #f00;
-    cursor: pointer;
-    z-index: 9999;
-    font-size: 25px;
-  }
 `;
 
 const PostBlock = styled.div`
@@ -76,12 +67,12 @@ const PostHeader = styled.div`
 `;
 
 const PostContent = styled.div`
-  margin: 70px 10px;
+  margin: 10px 10px;
   .hashtag {
-    font-size: 17px;
+    font-size: 18px;
   }
   .content {
-    margin: 10px 0;
+    margin: 10px 0 25px;
   }
 `;
 
@@ -113,10 +104,8 @@ const MainFeedSection = ({ filter }) => {
   useEffect(() => {
     if (filter.type === "all") {
       dispatch(fetchAllFeed());
-      // dispatch(fetchLikeList(user.userNo));
     } else if (filter.type === "following") {
       dispatch(fetchAllFeed(filter));
-      // dispatch(fetchLikeList(user.userNo));
     }
   }, [filter, dispatch]);
 
@@ -209,13 +198,22 @@ const MainFeedSection = ({ filter }) => {
               </SlideBlock>
             ))
           )}
+
           <LikeButton postId={post.postId} />
+
           <PostContent>
             <div className="hashtag"> {post.feedHashtags.join(" ")}</div>
             <div className="content">{post.content}</div>
           </PostContent>
           <PostFooter>
-            <div>Posted at: {new Date(post.created_at).toLocaleString()}</div>
+            {new Date(post.created_at).getTime() !==
+            new Date(post.updated_at).getTime() ? (
+              <div>
+                {new Date(post.updated_at).toLocaleString()} 에 수정되었습니다.
+              </div>
+            ) : (
+              <div>Posted at: {new Date(post.created_at).toLocaleString()}</div>
+            )}
           </PostFooter>
         </PostBlock>
       ))}

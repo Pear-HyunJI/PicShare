@@ -71,15 +71,6 @@ const PersonalFeedDetailSectionBlock = styled.div`
       }
     }
   }
-  .like {
-    margin-top: 30px;
-    position: absolute;
-    left: 40px;
-    color: #f00;
-    cursor: pointer;
-    z-index: 9999;
-    font-size: 25px;
-  }
 `;
 
 const PostBlock = styled.div`
@@ -113,12 +104,12 @@ const PostHeader = styled.div`
 `;
 
 const PostContent = styled.div`
-  margin: 65px 10px;
+  margin: 10px 10px;
   .hashtag {
-    font-size: 17px;
+    font-size: 18px;
   }
   .content {
-    margin: 10px 0;
+    margin: 10px 0 25px;
   }
 `;
 

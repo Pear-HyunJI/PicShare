@@ -37,43 +37,6 @@ otherRouter.post("/post/likeList", (req, res) => {
   });
 });
 
-// otherRouter.post("/post/likeList", (req, res) => {
-//   const userNo = req.body.userNo;
-//   db.query(
-//     `SELECT pl.*, p.content, i.imageUrl
-//      FROM postlike AS pl
-//      JOIN posts AS p ON pl.postId = p.postId
-//      LEFT JOIN images AS i ON pl.postId = i.postId
-//      WHERE pl.userNo = ?`,
-//     [userNo],
-//     (err, result) => {
-//       if (err) {
-//         console.error("에러", err);
-//         res.status(500).send("실패");
-//       } else {
-//         res.send(result);
-//       }
-//     }
-//   );
-// });
-
-// otherRouter.post("/post/likeList", (req, res) => {
-//   const userNo = req.body.userNo;
-//   db.query(`SELECT pl.postId, p.content, i.imageUrl
-//   FROM postlike AS pl
-//   JOIN posts AS p ON pl.postId = p.postId
-//   JOIN postimages AS i ON p.postId = i.postId
-//   WHERE pl.userNo = ?
-//   `, [userNo], (err, result) => {
-//     if (err) {
-//       console.error("에러", err);
-//       res.status(500).send("실패");
-//     } else {
-//       res.send(result);
-//     }
-//   });
-// });
-
 otherRouter.post("/post/likeToggle", (req, res) => {
   db.getConnection((err, connection) => {
     if (err) {
@@ -146,6 +109,26 @@ otherRouter.post("/post/likeToggle", (req, res) => {
         }
       );
     });
+  });
+});
+
+otherRouter.post("/post/likedUsers", (req, res) => {
+  const { postId } = req.body;
+
+  const query = `
+    SELECT u.userNo, u.userNickname, u.profilePicture
+    FROM postlike AS pl
+    JOIN users AS u ON pl.userNo = u.userNo
+    WHERE pl.postId = ? AND pl.isLiked = 1
+  `;
+
+  db.query(query, [postId], (err, result) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+    } else {
+      res.send(result);
+    }
   });
 });
 

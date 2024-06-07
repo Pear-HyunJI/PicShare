@@ -131,12 +131,8 @@ const FeedUpdateSection = () => {
   };
 
   const handleBack = () => {
-    const confirmSave = window.confirm("임시저장하시겠어요?");
-    if (confirmSave) {
-      handleSave();
-    } else {
-      navigate(-1);
-    }
+    handleSave();
+    navigate(-1);
   };
 
   return (
@@ -167,16 +163,18 @@ const FeedUpdateSection = () => {
             {photo.length > 3 && <span>+{photo.length - 3} more</span>}
           </div>
         </div>
+        <div className="hashtags">
+          {hashtags.map((hashtag, idx) => (
+            <span key={idx}>{hashtag}</span>
+          ))}
+        </div>
+        <p>콘텐츠를 수정하시겠어요? 아래에 새로운 내용을 입력하세요:</p>
         <textarea
           placeholder="피드 내용을 입력하세요..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <div className="hashtags">
-          {hashtags.map((hashtag, idx) => (
-            <span key={idx}>#{hashtag}</span>
-          ))}
-        </div>
+
         <button type="submit">수정</button>
       </FeedUpdateSectionBlock>
     </div>
