@@ -11,6 +11,8 @@ import Slider from "react-slick";
 import { FaAt, FaHashtag } from "react-icons/fa";
 import { MdPlace } from "react-icons/md";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const SearchSectionBlock = styled.div`
   display: flex;
   flex-direction: column;
@@ -219,7 +221,7 @@ const SearchComponent = () => {
               <UserResult key={user.userNo}>
                 <Link to={`/personalpage/${user.userNo}`} className="imageBox">
                   <img
-                    src={`http://localhost:8001/uploads/${user.profilePicture}`}
+                    src={`${serverUrl}/uploads/${user.profilePicture}`}
                     alt={user.userNickname}
                   />
                   <span>@{user.userNickname}</span>

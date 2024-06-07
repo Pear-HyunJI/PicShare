@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/PicShare.png";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const JoinSectionBlock = styled.div`
   max-width: 345px;
   margin: 50px auto;
@@ -103,7 +105,7 @@ const JoinSection = () => {
   const [success, setSuccess] = useState({});
   const [useDefaultProfile, setUseDefaultProfile] = useState(true); // 기본은 기본프로필 사용
   const [profilePreview, setProfilePreview] = useState(
-    "http://localhost:8001/uploads/defaultProfile.jpg"
+    `${serverUrl}/uploads/defaultProfile.jpg`
   ); // 프로필프리뷰
 
   // 프로필프리뷰
@@ -113,7 +115,7 @@ const JoinSection = () => {
       console.log("체크박스 클릭시", newUseDefaultProfile);
       setProfilePreview(
         newUseDefaultProfile
-          ? "http://localhost:8001/uploads/defaultProfile.jpg"
+          ? `${serverUrl}/uploads/defaultProfile.jpg`
           : profilePreview
       );
       return newUseDefaultProfile;
@@ -136,7 +138,7 @@ const JoinSection = () => {
 
     if (name === "email" && value) {
       try {
-        await axios.post("http://localhost:8001/auth/check-email", {
+        await axios.post(`${serverUrl}/auth/check-email`, {
           email: value,
         });
         setSuccess((success) => ({
@@ -152,7 +154,7 @@ const JoinSection = () => {
 
     if (name === "userNickname" && value) {
       try {
-        await axios.post("http://localhost:8001/auth/check-nickname", {
+        await axios.post(`${serverUrl}/auth/check-nickname`, {
           userNickname: value,
         });
         setSuccess((success) => ({
@@ -186,7 +188,7 @@ const JoinSection = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8001/auth/join",
+        `${serverUrl}/auth/join`,
         formData,
         {
           headers: {

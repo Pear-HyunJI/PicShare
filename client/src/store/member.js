@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const memberSlice = createSlice({
   name: "member",
   initialState: {
@@ -50,7 +52,7 @@ export const { userLogin, userLogout, localUser, initUsers } =
 // 모든 유저 정보 요청하기
 export const fetchUsers = () => (dispatch) => {
   axios
-    .get("http://localhost:8001/auth/users")
+    .get(`${serverUrl}/auth/users`)
     .then((res) => {
       console.log("유저목록", res);
       const data = res.data;

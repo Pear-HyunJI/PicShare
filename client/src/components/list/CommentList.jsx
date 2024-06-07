@@ -6,6 +6,8 @@ import { AiFillMessage } from "react-icons/ai";
 // import FollowButton from '../follow/FollowButton';
 // import { Link } from "react-router-dom";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const CommentListBlock = styled.div`
 display: flex;
 flex-direction: column;
@@ -47,7 +49,7 @@ const CommentList = () => {
     useEffect(() => {
       if (user) {
         axios
-          .post("http://localhost:8001/other/post/likeList", {
+          .post(`${serverUrl}/other/post/likeList`, {
             userNo: user.userNo,
           })
           .then((res) => {

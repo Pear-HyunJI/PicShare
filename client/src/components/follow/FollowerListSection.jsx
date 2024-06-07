@@ -4,6 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import FollowButton from "@/components/follow/FollowButton";
 import { IoIosArrowBack } from "react-icons/io";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const FollowerListSectionBlock = styled.div`
   .top {
     .tag {
@@ -106,7 +108,7 @@ const FollowerListSection = () => {
             <FollowerList key={user.userNo}>
               <Link to={`/personalpage/${user.userNo}`} className="imageBox">
                 <img
-                  src={`http://localhost:8001/uploads/${user.profilePicture}`}
+                  src={`${serverUrl}/uploads/${user.profilePicture}`}
                   alt={user.userNickname}
                 />
                 <span>@{user.userNickname}</span>

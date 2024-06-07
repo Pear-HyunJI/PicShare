@@ -5,6 +5,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { IoIosArrowBack } from "react-icons/io";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const FeedInsertSectionBlock = styled.form`
   max-width: 600px;
   margin: auto;
@@ -177,7 +179,7 @@ const FeedInsertSection = () => {
     }
 
     try {
-      await axios.post("http://localhost:8001/feed/insert", formData, {
+      await axios.post(`${serverUrl}/feed/insert`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { fetchFollowingList, fetchFollowerList } from "@/store/follow";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const FollowButtonBlock = styled.div`
   margin: 10px 27px;
   display: flex;
@@ -39,7 +41,7 @@ const FollowButton = ({ userNo }) => {
 
   const handleFollow = async () => {
     try {
-      await axios.post("http://localhost:8001/follow/followfunction", {
+      await axios.post(`${serverUrl}/follow/followfunction`, {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });
@@ -52,7 +54,7 @@ const FollowButton = ({ userNo }) => {
 
   const handleUnfollow = async () => {
     try {
-      await axios.post("http://localhost:8001/follow/unfollowfunction", {
+      await axios.post(`${serverUrl}/follow/unfollowfunction`, {
         followerId: currentUser.userNo,
         followeeId: userNo,
       });

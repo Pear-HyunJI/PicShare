@@ -11,6 +11,8 @@ import { fetchAllFeed } from "@/store/feed";
 import axios from "axios";
 import LikeButton from "@/components/list/LikeButton";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const PersonalFeedDetailSectionBlock = styled.div`
   padding: 20px;
   position: relative;
@@ -189,7 +191,7 @@ const PersonalFeedDetailSection = () => {
     const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
     if (confirmDelete) {
       axios
-        .delete(`http://localhost:8001/feed/delete`, { params: { postId } })
+        .delete(`${serverUrl}/feed/delete`, { params: { postId } })
         .then((res) => {
           if (res.data === "포스트 및 관련 데이터 삭제 완료") {
             console.log(res.data);
@@ -231,7 +233,7 @@ const PersonalFeedDetailSection = () => {
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
               <img
-                src={`http://localhost:8001/uploads/${post.profilePicture}`}
+                src={`${serverUrl}/uploads/${post.profilePicture}`}
                 alt={post.userNickname}
                 style={{
                   width: "50px",

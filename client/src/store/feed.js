@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const feedSlice = createSlice({
   name: "feed",
   initialState: {
@@ -59,7 +61,7 @@ export const fetchAllFeed = (filter) => (dispatch) => {
 
   // filter가 all일때는 요청할대 filter를 보내지 않았음.
   if (!filter || filter.length === 0) {
-    const url = "http://localhost:8001/feed/all";
+    const url = `${serverUrl}/feed/all`;
     axios
       .get(url)
       .then((res) => {
@@ -83,7 +85,7 @@ export const fetchAllFeed = (filter) => (dispatch) => {
 
   // 각 userNo에 대한 fetch 요청을 생성하여 배열에 담기
   const requests = userNos.map((userNo) => {
-    const url = `http://localhost:8001/feed/all?userNo=${userNo}`;
+    const url = `${serverUrl}/feed/all?userNo=${userNo}`;
     return axios.get(url);
   });
 
@@ -101,7 +103,7 @@ export const fetchAllFeed = (filter) => (dispatch) => {
 export const fetchPostByPostid = (postId) => (dispatch) => {
   dispatch(initFeedStart());
   axios
-    .get(`http://localhost:8001/feed/postbypostid?postId=${postId}`)
+    .get(`${serverUrl}/feed/postbypostid?postId=${postId}`)
     .then((res) => {
       const post = res.data;
       console.log("포스트바이아이디", post);
@@ -114,7 +116,7 @@ export const fetchPostByPostid = (postId) => (dispatch) => {
 
 export const updateFeed = (postId, updatedData) => (dispatch) => {
   axios
-    .put(`http://localhost:8001/feed/update?postId=${postId}`, updatedData)
+    .put(`${serverUrl}/feed/update?postId=${postId}`, updatedData)
     .then((res) => {
       const updatedPost = res.data;
       console.log("업데이트 데이터", updatedPost);

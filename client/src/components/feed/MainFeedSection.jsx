@@ -9,6 +9,8 @@ import { AiFillMessage } from "react-icons/ai";
 import LikeButton from "@/components/list/LikeButton";
 import { fetchLikeList } from "@/store/like";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
   position: relative;
@@ -143,7 +145,7 @@ const MainFeedSection = ({ filter }) => {
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
               <img
-                src={`http://localhost:8001/uploads/${post.profilePicture}`}
+                src={`${serverUrl}/uploads/${post.profilePicture}`}
                 alt={post.userNickname}
                 style={{
                   width: "50px",

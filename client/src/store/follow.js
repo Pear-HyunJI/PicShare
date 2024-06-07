@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const followSlice = createSlice({
   name: "follow",
   initialState: {
@@ -23,7 +25,7 @@ export const { initFollowingList, initFollowerList } = followSlice.actions;
 export const fetchFollowingList = (userNo) => async (dispatch) => {
   try {
     const res = await axios.get(
-      `http://localhost:8001/follow/followinglist?userNo=${userNo}`
+      `${serverUrl}/follow/followinglist?userNo=${userNo}`
     );
     console.log("팔로잉유저리스트", res);
     const data = res.data;
@@ -40,7 +42,7 @@ export const fetchFollowingList = (userNo) => async (dispatch) => {
 export const fetchFollowerList = (userNo) => async (dispatch) => {
   try {
     const res = await axios.get(
-      `http://localhost:8001/follow/followerlist?userNo=${userNo}`
+      `${serverUrl}/follow/followerlist?userNo=${userNo}`
     );
     console.log("팔로워유저리스트", res);
     const data = res.data;

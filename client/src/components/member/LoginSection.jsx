@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { userLogin } from "@/store/member";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const LoginSectionBlock = styled.div`
   max-width: 345px;
   margin: 50px auto;
@@ -92,7 +94,7 @@ const LoginSection = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8001/auth/login", {
+      const response = await axios.post(`${serverUrl}/auth/login`, {
         email,
         password,
       });

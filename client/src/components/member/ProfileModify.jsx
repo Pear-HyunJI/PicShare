@@ -5,6 +5,8 @@ import styled from "styled-components";
 import axios from "axios";
 import { fetchUsers, userLogout } from "@/store/member";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const ProfileModifyBlock = styled.div`
   max-width: 345px;
   margin: 50px auto;
@@ -112,7 +114,7 @@ const ProfileModify = () => {
 
   useEffect(() => {
     if (user) {
-      setProfilePreview(`http://localhost:8001/uploads/${user.profilePicture}`);
+      setProfilePreview(`${serverUrl}/uploads/${user.profilePicture}`);
       setUserInfo((prevState) => ({
         ...prevState,
         userNickname: user.userNickname,
@@ -125,8 +127,8 @@ const ProfileModify = () => {
       const newUseDefaultProfile = !prevUseDefaultProfile;
       setProfilePreview(
         newUseDefaultProfile
-          ? "http://localhost:8001/uploads/defaultProfile.jpg"
-          : `http://localhost:8001/uploads/${user.profilePicture}`
+          ? `${serverUrl}/uploads/defaultProfile.jpg`
+          : `${serverUrl}/uploads/${user.profilePicture}`
       );
       return newUseDefaultProfile;
     });
@@ -147,7 +149,7 @@ const ProfileModify = () => {
     // 닉네임 중복 체크
     if (name === "userNickname" && value) {
       try {
-        await axios.post("http://localhost:8001/auth/check-nickname", {
+        await axios.post(`${serverUrl}/auth/check-nickname`, {
           userNickname: value,
         });
         setSuccess((success) => ({
@@ -181,7 +183,7 @@ const ProfileModify = () => {
   //   console.log("폼데이터", formData);
   //   try {
   //     const res = axios.put(
-  //       "http://localhost:8001/auth/update-profile",
+  //       `${serverUrl}/auth/update-profile`,
   //       formData,
   //       {
   //         headers: {
@@ -219,7 +221,7 @@ const ProfileModify = () => {
 
     try {
       const res = await axios.put(
-        "http://localhost:8001/auth/update-profile",
+        `${serverUrl}/auth/update-profile`,
         formData,
         {
           headers: {
@@ -257,7 +259,7 @@ const ProfileModify = () => {
 
     if (confirmDelete) {
       axios
-        .delete(`http://localhost:8001/auth/delete`, { params: { userNo } })
+        .delete(`${serverUrl}/auth/delete`, { params: { userNo } })
         .then((res) => {
           if (res) {
             console.log(res.data);

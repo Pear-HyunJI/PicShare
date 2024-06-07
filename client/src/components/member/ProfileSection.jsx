@@ -7,6 +7,8 @@ import axios from "axios";
 import FollowButton from "../follow/FollowButton";
 import { fetchFollowerList, fetchFollowingList } from "@/store/follow";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const ProfileSectionBlock = styled.div`
   margin: 100px 100px 80px 100px;
   .profile {
@@ -65,7 +67,7 @@ const ProfileSection = ({ length }) => {
   useEffect(() => {
     const fetchTargetUserData = (targetUserNo) => {
       axios
-        .get(`http://localhost:8001/auth/users?targetUserNo=${targetUserNo}`)
+        .get(`${serverUrl}/auth/users?targetUserNo=${targetUserNo}`)
         .then((res) => {
           const data = res.data;
           setUser(data);
@@ -120,7 +122,7 @@ const ProfileSection = ({ length }) => {
     <ProfileSectionBlock>
       <div className="profile">
         <img
-          src={`http://localhost:8001/uploads/${user[0].profilePicture}`}
+          src={`${serverUrl}/uploads/${user[0].profilePicture}`}
           alt="프로필사진"
         />
         <div className="length">
