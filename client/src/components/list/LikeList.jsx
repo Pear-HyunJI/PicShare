@@ -90,8 +90,8 @@ const PostFooter = styled.div`
 `;
 
 const SlideBlock = styled.div`
-  width: 100%;
-  height: 500px;
+  width: 50%;
+  height: 250px;
   background-color: #ddd;
   display: flex;
   align-items: center;

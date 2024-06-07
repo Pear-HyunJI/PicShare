@@ -102,9 +102,6 @@ const LikeButton = ({ postId }) => {
           <FaHeart />
         )}
       </span> */}
-      <span>
-        <FaHeart />
-      </span>
     </LikeButtonBlock>
   );
 };

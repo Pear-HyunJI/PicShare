@@ -11,6 +11,7 @@ import { fetchLikeList } from "@/store/like";
 
 const MainFeedSectionBlock = styled.div`
   margin: 0 20px;
+  position: relative;
   .slidesection {
     .slick-dots {
       position: absolute;
@@ -38,6 +39,15 @@ const MainFeedSectionBlock = styled.div`
       }
     }
   }
+  .like {
+    margin-top: 30px;
+    position: absolute;
+    left: 20px;
+    color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
 `;
 
 const PostBlock = styled.div`
@@ -52,17 +62,10 @@ const PostHeader = styled.div`
   align-items: center;
   margin-bottom: 10px;
   position: relative;
-  .like {
-    position: absolute;
-    right: 10px;
-    color: #f00;
-    cursor: pointer;
-    z-index: 9999;
-    font-size: 25px;
-  }
+
   .comment {
     position: absolute;
-    right: 40px;
+    right: 10px;
     color: #000;
     cursor: pointer;
     z-index: 9999;
@@ -71,7 +74,7 @@ const PostHeader = styled.div`
 `;
 
 const PostContent = styled.div`
-  margin: 30px 10px;
+  margin: 70px 10px;
   .hashtag {
     font-size: 17px;
   }
@@ -85,8 +88,8 @@ const PostFooter = styled.div`
 `;
 
 const SlideBlock = styled.div`
-  width: 100%;
-  height: 500px;
+  width: 80%;
+  height: 400px;
   background-color: #ddd;
   display: flex;
   align-items: center;
@@ -151,7 +154,7 @@ const MainFeedSection = ({ filter }) => {
               />
               <span>{post.userNickname}</span>
             </Link>
-            <LikeButton postId={post.postId} />
+
             <span className="comment">
               <AiFillMessage />
             </span>
@@ -202,6 +205,7 @@ const MainFeedSection = ({ filter }) => {
               </SlideBlock>
             ))
           )}
+          <LikeButton postId={post.postId} />
           <PostContent>
             <div className="hashtag"> {post.feedHashtags.join(" ")}</div>
             <div className="content">{post.content}</div>
