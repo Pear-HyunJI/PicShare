@@ -15,9 +15,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// 피드 작성
 feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
-  const { userNo, content, hashtags, scheduled_at } = req.body;
+  const {
+    userNo,
+    content,
+    hashtags,
+    scheduled_at,
+    weather,
+    weathericon,
+    locationName,
+  } = req.body;
   const files = req.files;
 
   // 이미지 파일이 없는 경우 에러 반환
@@ -29,10 +36,24 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
   const createdAtValue = scheduled_at ? scheduled_at : new Date();
   const scheduledAtValue = scheduled_at ? scheduled_at : null;
 
+  // 웨더 정보에서 따옴표와 역슬래시 제거
+  const Weather = weather.replace(/['"\\]+/g, "");
+
   // post테이블에 userNo, content, scheduled_at(예약설정시간) 저장
   db.query(
-    `INSERT INTO posts (userNo, content, scheduled_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
-    [userNo, content, scheduledAtValue, createdAtValue, createdAtValue],
+    `INSERT INTO posts (userNo, content, scheduled_at, created_at, updated_at, locationName,   weatherInfo, weathericon) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      userNo,
+      content,
+      scheduledAtValue,
+      createdAtValue,
+      createdAtValue,
+      locationName,
+
+      JSON.stringify(Weather),
+      weathericon,
+    ],
+
     (err, result) => {
       if (err) {
         console.error("post인서트 에러:", err);

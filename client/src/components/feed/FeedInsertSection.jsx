@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
@@ -9,7 +9,7 @@ const serverUrl = import.meta.env.VITE_API_URL;
 
 const FeedInsertSectionBlock = styled.form`
   max-width: 600px;
-  margin: auto;
+  margin: 0 auto 150px;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -114,7 +114,8 @@ const FeedInsertSectionBlock = styled.form`
     }
   }
 
-  .scheduled-section {
+  .scheduled-section,
+  .location-section {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -129,13 +130,36 @@ const FeedInsertSectionBlock = styled.form`
       }
     }
 
-    .datetime-input {
+    .inputfield {
       width: 100%;
     }
   }
 `;
 
 const FeedInsertSection = () => {
+  const API_KEY = "80870be1de28bf2e9c801995bec16bf2";
+
+  const getWeatherByCoords = async (lat, lon) => {
+    const response = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+    );
+    return response.data;
+  };
+
+  const getWeatherByLocationName = async (locationName) => {
+    const response = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?q=${locationName}&appid=${API_KEY}&units=metric`
+    );
+    return response.data;
+  };
+
+  const getLocationNameByCoords = async (lat, lon) => {
+    const response = await axios.get(
+      `http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`
+    );
+    return response.data[0].name;
+  };
+
   const user = useSelector((state) => state.members.user);
   const navigate = useNavigate();
   const [content, setContent] = useState("");
@@ -143,6 +167,25 @@ const FeedInsertSection = () => {
   const [hashtags, setHashtags] = useState([""]);
   const [scheduledAt, setScheduledAt] = useState("");
   const [isScheduled, setIsScheduled] = useState(false);
+  const [showWeatherInfo, setShowWeatherInfo] = useState(false); // 체크박스 관련
+
+  const [weather, setWeather] = useState(null); // 날씨 정보를 저장할 상태
+  const [locationName, setLocationName] = useState(""); // 장소 이름 저장 상태
+  const [latitude, setLatitude] = useState(null); // 위도 저장 상태
+  const [longitude, setLongitude] = useState(null); // 경도 저장 상태
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      setLatitude(latitude);
+      setLongitude(longitude);
+      const weatherData = await getWeatherByCoords(latitude, longitude);
+      setWeather(weatherData);
+      const locName = await getLocationNameByCoords(latitude, longitude);
+      setLocationName(locName);
+      fetchRecommendedHashtags(weatherData.weather[0].main.toLowerCase());
+    });
+  }, []);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -174,6 +217,9 @@ const FeedInsertSection = () => {
       formData.append("images", file);
     });
     formData.append("hashtags", hashtags.join(" "));
+    formData.append("weather", weather ? weather.weather[0].description : null); // 날씨 정보 추가
+    formData.append("weathericon", weather ? weather.weather[0].icon : null); // 날씨 정보 추가
+    formData.append("locationName", locationName); // 장소 이름 추가
 
     if (!isImmediate) {
       formData.append("scheduled_at", scheduledAt || null);
@@ -199,6 +245,28 @@ const FeedInsertSection = () => {
       navigate(-1);
     }
   };
+
+  const handleLocationChange = (e) => {
+    setLocationName(e.target.value);
+  };
+
+  const handleGetWeatherByLocation = async () => {
+    try {
+      const weatherData = await getWeatherByLocationName(locationName);
+      setLatitude(weatherData.coord.lat);
+      setLongitude(weatherData.coord.lon);
+      setWeather(weatherData);
+    } catch (err) {
+      console.error("Failed to fetch weather data:", err);
+      alert("날씨 정보를 가져오는데 실패했습니다. 장소 이름을 확인해주세요.");
+    }
+  };
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      getWeatherByCoords(latitude, longitude).then((weatherData) => {});
+    }
+  }, [latitude, longitude]);
 
   return (
     <div>
@@ -278,6 +346,41 @@ const FeedInsertSection = () => {
             </div>
           ))}
         </div>
+        <div className="location-section">
+          <div className="checkbox-label">
+            <p>위치와 날씨 정보를 게시하시겠습니까?</p>
+            <label>
+              <input
+                type="checkbox"
+                checked={showWeatherInfo}
+                onChange={() => setShowWeatherInfo(!showWeatherInfo)}
+              />
+              <span style={{ color: "#09fc52", fontWeight: "bold" }}>
+                위치 및 날씨 정보 게시
+              </span>
+            </label>
+          </div>
+          {showWeatherInfo && (
+            <div className="inputfield">
+              <input
+                type="text"
+                placeholder="장소 이름을 입력하세요..."
+                value={locationName}
+                onChange={handleLocationChange}
+              />
+              <button type="button" onClick={handleGetWeatherByLocation}>
+                날씨 정보 가져오기
+              </button>
+              <p>현재 위치: {locationName}</p>
+              <p>현재 날씨: {weather.weather[0].description}</p>
+              <p>온도: {weather.main.temp}°C</p>
+              <img
+                src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
+                alt={weather.weather[0].description}
+              />
+            </div>
+          )}
+        </div>
         <div className="scheduled-section">
           <div className="checkbox-label">
             <p>지정된 시간에 게시물을 자동으로 올리시겠습니까?</p>
@@ -294,13 +397,14 @@ const FeedInsertSection = () => {
           </div>
           {isScheduled && (
             <input
-              className="datetime-input"
+              className="inputfield"
               type="datetime-local"
               value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
             />
           )}
         </div>
+
         <button type="submit">포스팅</button>
         {/* <button type="button" onClick={handleBack}>
           뒤로가기
