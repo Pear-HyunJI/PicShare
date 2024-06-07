@@ -6,6 +6,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import { fetchAllFeed } from "@/store/feed";
 import { AiFillMessage } from "react-icons/ai";
+import { IoMdCloseCircle } from "react-icons/io";
 import LikeButton from "@/components/list/LikeButton";
 import { fetchLikeList } from "@/store/like";
 
@@ -95,11 +96,73 @@ const PostImage = styled.img`
   display: inline-block;
 `;
 
+const Modal = styled.div`
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: ${(props) => (props.show === "true" ? "50%" : "100%")};
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  background: #fff;
+  box-shadow: -2px 0 15px rgba(0, 0, 0, 0.5);
+  transition: top 0.5s ease-in-out;
+  z-index: 10000;
+  border-radius: 10px;
+`;
+
+const ModalContent = styled.div`
+  position: relative;
+  padding: 10px;
+  button {
+    right: 10px;
+    position: absolute;
+    font-size: 25px;
+  }
+  .postcontent {
+    margin: 20px 0px;
+    font-weight: bold;
+  }
+`;
+
 const MainFeedSection = ({ filter }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
   const user = useSelector((state) => state.members.user);
+
+  // 댓글창
+  const [showModal, setShowModal] = useState(false);
+  const [currentPost, setCurrentPost] = useState(null);
+
+  const openModal = (index) => {
+    setCurrentPost(feeds[index]); // post 객체 전체를 설정합니다.
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setCurrentPost(null);
+  };
+
+  //댓글
+  const [mycomment, setMyComment] = useState("");
+  const [comments, setComments] = useState([]);
+
+  // 텍스트박스 변경 핸들러
+  const handleInputChange = (event) => {
+    setMyComment(event.target.value);
+  };
+
+  // 엔터 키 핸들러
+  const handleEnterPress = (event) => {
+    if (event.key === "Enter") {
+      // 입력된 값을 comments 배열에 추가하고, mycomment 상태를 초기화
+      setComments((prevComments) => [...prevComments, mycomment]);
+      setMyComment("");
+    }
+  };
 
   useEffect(() => {
     if (filter.type === "all") {
@@ -146,7 +209,10 @@ const MainFeedSection = ({ filter }) => {
               <span>{post.userNickname}</span>
             </Link>
 
-            <span className="comment">
+            <span
+              className="comment"
+              onClick={() => openModal(filteredFeeds.indexOf(post))}
+            >
               <AiFillMessage />
             </span>
           </PostHeader>
@@ -217,6 +283,40 @@ const MainFeedSection = ({ filter }) => {
           </PostFooter>
         </PostBlock>
       ))}
+      {showModal && currentPost && (
+        <Modal show={showModal.toString()}>
+          <ModalContent>
+            <button onClick={closeModal}>
+              <IoMdCloseCircle />
+            </button>
+            <div className="postcontent">
+              {currentPost.userNickname}&nbsp;:&nbsp;{currentPost.content}
+            </div>
+            <div
+              className="comments"
+              style={{ marginBottom: "10px", lineHeight: "2" }}
+            >
+              {user.userNickname}&nbsp;:&nbsp;
+              {comments.map((comment, index) => (
+                <div key={index}>{comment}</div>
+              ))}
+            </div>
+            <div className="mycomment">
+              <input
+                type="text"
+                value={mycomment}
+                onChange={handleInputChange}
+                onKeyPress={handleEnterPress}
+                placeholder="댓글을 입력하세요."
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                }}
+              />
+            </div>
+          </ModalContent>
+        </Modal>
+      )}
     </MainFeedSectionBlock>
   );
 };
