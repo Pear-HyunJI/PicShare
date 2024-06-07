@@ -132,4 +132,66 @@ otherRouter.post("/post/likedUsers", (req, res) => {
   });
 });
 
+//댓글쓰기
+otherRouter.post("/post/comment", (req, res) => {
+  console.log("댓글 저장 요청이 도착했습니다.");
+  db.getConnection((err, connection) => {
+    if (err) {
+      console.error("에러", err);
+      res.status(500).send("실패");
+      return;
+    }
+
+    connection.beginTransaction((err) => {
+      if (err) {
+        console.error("에러", err);
+        res.status(500).send("실패");
+        connection.release();
+        return;
+      }
+
+      const { postId, comment, userNo } = req.body;
+      const date = dayjs();
+
+      const insertCommentQuery = `
+        INSERT INTO comments (postId, comment, userNo, date) 
+        VALUES (?, ?, ?, ?)
+      `;
+
+      connection.query(
+        insertCommentQuery,
+        [postId, comment, userNo, date.format("YYYY-MM-DD HH:mm:ss")],
+        (err, result) => {
+          if (err) {
+            return connection.rollback(() => {
+              connection.release();
+              res.status(500).send(err);
+            });
+          }
+
+          connection.commit((err) => {
+            if (err) {
+              return connection.rollback(() => {
+                connection.release();
+                res.status(500).send(err);
+              });
+            }
+
+            console.log("댓글이 성공적으로 저장되었습니다.");
+            connection.release();
+            res.send("댓글이 성공적으로 저장되었습니다.");
+          });
+        }
+      );
+    });
+  });
+});
+
+
+//댓글리스트
+// otherRouter.post("/post/commentList", (req, res) => {
+//   const userNo = req.body.userNo;
+// });
+
+
 export default otherRouter;

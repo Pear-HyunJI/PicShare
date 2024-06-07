@@ -7,8 +7,12 @@ import "slick-carousel/slick/slick.css";
 import { fetchAllFeed } from "@/store/feed";
 import { AiFillMessage } from "react-icons/ai";
 import { IoMdCloseCircle } from "react-icons/io";
+import { RiCloseFill } from "react-icons/ri";
 import LikeButton from "@/components/list/LikeButton";
-import { fetchLikeList } from "@/store/like";
+import axios from "axios";
+import { MdPlace } from "react-icons/md";
+
+// import { fetchLikeList } from "@/store/like";
 
 const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -43,6 +47,7 @@ const MainFeedSectionBlock = styled.div`
     }
   }
 `;
+
 
 const PostBlock = styled.div`
   border: 1px solid #ddd;
@@ -94,7 +99,9 @@ const PostImage = styled.img`
   max-width: 100%;
   max-height: 100%;
   display: inline-block;
+  position: relative; /* Added position relative */
 `;
+
 
 const Modal = styled.div`
   position: fixed;
@@ -125,6 +132,21 @@ const ModalContent = styled.div`
     font-weight: bold;
   }
 `;
+
+// 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const LocationWrap = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  display: ${(props) => (props.show ? "block" : "none")};
+`;
+
 
 const MainFeedSection = ({ filter }) => {
   const navigate = useNavigate();
@@ -158,11 +180,40 @@ const MainFeedSection = ({ filter }) => {
   // 엔터 키 핸들러
   const handleEnterPress = (event) => {
     if (event.key === "Enter") {
+      // 입력된 값을 서버로 전송
+      saveComment(currentPost.postId, user.userNo, mycomment);
       // 입력된 값을 comments 배열에 추가하고, mycomment 상태를 초기화
       setComments((prevComments) => [...prevComments, mycomment]);
       setMyComment("");
     }
   };
+
+  const saveComment = (postId, comment, userNo) => {
+    console.log("댓글 저장 요청을 보냈습니다.");
+    axios("/post/comment", {
+          method: "POST",
+          body: JSON.stringify({ postId, comment, userNo }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("댓글이 저장되었습니다.", data);
+        })
+        .catch((error) => {
+          console.error("댓글 저장 실패:", error);
+        });
+  };
+
+    // 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // 위치정보 나오게
+    const [clickedImageIndex, setClickedImageIndex] = useState(null);
+    // 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    const handleImageClick = (index) => {
+      setClickedImageIndex(index === clickedImageIndex ? null : index);
+    };
+
 
   useEffect(() => {
     if (filter.type === "all") {
@@ -227,9 +278,8 @@ const MainFeedSection = ({ filter }) => {
                       display: "flex",
                       justifyContent: "center",
                       textAlign: "center",
-                    }}
-                  >
-                    <PostImage
+                    }} onClick={() => handleImageClick(index)} >
+                       <PostImage
                       className="postImage"
                       src={`${serverUrl}/uploads/${image.imageUrl}`}
                       alt={`Post ${post.postId} Image`}
@@ -237,6 +287,16 @@ const MainFeedSection = ({ filter }) => {
                         display: "inline-block",
                       }}
                     />
+                    {clickedImageIndex === index && (
+                      <LocationWrap show>
+                        <MdPlace /> {post.locationName}
+                        <img
+                          src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
+                          alt="Weather Icon"
+                        />{" "}
+                        {post.weatherInfo}
+                      </LocationWrap>
+                    )}
                   </SlideBlock>
                 ))}
               </Slider>
@@ -252,7 +312,7 @@ const MainFeedSection = ({ filter }) => {
                   textAlign: "center",
                   width: "100%",
                   height: "400px",
-                }}
+                }} onClick={() => handleImageClick(index)}
               >
                 <PostImage
                   src={`${serverUrl}/uploads/${image.imageUrl}`}
@@ -261,7 +321,18 @@ const MainFeedSection = ({ filter }) => {
                     display: "inline-block",
                   }}
                 />
+              {clickedImageIndex === index && (
+                  <LocationWrap show>
+                    <MdPlace /> {post.locationName}
+                    <img
+                      src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
+                      alt="Weather Icon"
+                    />{" "}
+                    {post.weatherInfo}
+                  </LocationWrap>
+                )}
               </SlideBlock>
+
             ))
           )}
 
@@ -292,28 +363,27 @@ const MainFeedSection = ({ filter }) => {
             <div className="postcontent">
               {currentPost.userNickname}&nbsp;:&nbsp;{currentPost.content}
             </div>
-            <div
-              className="comments"
-              style={{ marginBottom: "10px", lineHeight: "2" }}
-            >
-              {user.userNickname}&nbsp;:&nbsp;
-              {comments.map((comment, index) => (
-                <div key={index}>{comment}</div>
-              ))}
+            <div className="comments" style={{ marginBottom:"10px", lineHeight: "2" }}>
+            {comments.map((comment, index) => (
+      <div key={index}>
+        {user.userNickname}&nbsp;:&nbsp;{comment}
+        <span className=""><RiCloseFill style={{ position: "absolute", marginTop:"10px", marginLeft:"10px", color: "red" }}/></span>
+      </div>
+    ))}
             </div>
             <div className="mycomment">
-              <input
-                type="text"
-                value={mycomment}
-                onChange={handleInputChange}
-                onKeyPress={handleEnterPress}
-                placeholder="댓글을 입력하세요."
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                }}
-              />
+                <input
+                  type="text"
+                  value={mycomment}
+                  onChange={handleInputChange}
+                  onKeyPress={handleEnterPress}
+                  placeholder="댓글을 입력하세요."
+                  style={{
+                    width: "100%",
+                    padding: "10px"
+                  }}/>
             </div>
+            
           </ModalContent>
         </Modal>
       )}
