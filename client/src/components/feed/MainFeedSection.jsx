@@ -193,6 +193,8 @@ const MainFeedSection = ({ filter }) => {
                   display: "flex",
                   justifyContent: "center",
                   textAlign: "center",
+                  width: "80%",
+                  height: "400px",
                 }}
               >
                 <PostImage
