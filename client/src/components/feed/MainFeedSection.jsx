@@ -193,7 +193,7 @@ const MainFeedSection = ({ filter }) => {
                   display: "flex",
                   justifyContent: "center",
                   textAlign: "center",
-                  width: "80%",
+                  width: "100%",
                   height: "400px",
                 }}
               >
