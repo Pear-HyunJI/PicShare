@@ -43,7 +43,7 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
 
       // images 테이블에 이미지 저장
       const imageInsert = files.map((file) => {
-        const imageUrl = `http://localhost:8001/uploads/${file.filename}`;
+        const imageUrl = file.filename;
         return new Promise((imageres, imagedata) => {
           db.query(
             `INSERT INTO images (postId, imageUrl) VALUES (?, ?)`,

@@ -156,7 +156,11 @@ const FeedUpdateSection = () => {
         <div className="images">
           <div className="imagewrap">
             {photo.slice(0, 3).map((file, idx) => (
-              <img key={idx} src={file.imageUrl} alt="upload preview" />
+              <img
+                key={idx}
+                src={`${serverUrl}/uploads/${file.imageUrl}`}
+                alt="upload preview"
+              />
             ))}
           </div>
           <div className="lengthwrap">

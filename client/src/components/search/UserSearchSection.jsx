@@ -251,7 +251,10 @@ const SearchComponent = () => {
                 >
                   <div>
                     {feed.feedImages.length > 0 && (
-                      <img src={feed.feedImages[0].imageUrl} alt="" />
+                      <img
+                        src={`${serverUrl}/uploads/${feed.feedImages[0].imageUrl}`}
+                        alt=""
+                      />
                     )}
                     <div className="hashtag">
                       {" "}

@@ -147,6 +147,7 @@ const FeedInsertSection = () => {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     setImages(files);
+    console.log(images);
   };
 
   const handleHashtagChange = (index, value) => {

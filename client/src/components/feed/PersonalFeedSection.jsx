@@ -24,6 +24,8 @@ const PersonalFeedSectionBlock = styled.div`
   }
 `;
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const PersonalFeedSection = ({ setFilteredFeeds, filteredFeeds }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -61,7 +63,10 @@ const PersonalFeedSection = ({ setFilteredFeeds, filteredFeeds }) => {
           onClick={() => handleFeedClick(feed.postId)}
         >
           {feed.feedImages.length > 0 && (
-            <img src={feed.feedImages[0].imageUrl} alt="" />
+            <img
+              src={`${serverUrl}/uploads/${feed.feedImages[0].imageUrl}`}
+              alt=""
+            />
           )}
         </div>
       ))}

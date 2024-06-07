@@ -171,7 +171,7 @@ const LikeList = () => {
                   >
                     <PostImage
                       className="postImage"
-                      src={image}
+                      src={`${serverUrl}/uploads/${image}`}
                       alt={`Post ${post.postId} Image`}
                       style={{
                         display: "inline-block",
@@ -190,10 +190,12 @@ const LikeList = () => {
                   display: "flex",
                   justifyContent: "center",
                   textAlign: "center",
+                  width: "100%",
+                  height: "250px",
                 }}
               >
                 <PostImage
-                  src={image}
+                  src={`${serverUrl}/uploads/${image}`}
                   style={{
                     display: "inline-block",
                   }}

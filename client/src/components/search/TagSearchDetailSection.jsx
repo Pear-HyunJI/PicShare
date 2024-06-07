@@ -203,7 +203,7 @@ const TagSearchDetailSection = () => {
                   >
                     <PostImage
                       className="postImage"
-                      src={image.imageUrl}
+                      src={`${serverUrl}/uploads/${image.imageUrl}`}
                       alt={`Post ${post.postId} Image`}
                       style={{
                         display: "inline-block",
@@ -225,7 +225,7 @@ const TagSearchDetailSection = () => {
                 }}
               >
                 <PostImage
-                  src={image.imageUrl}
+                  src={`${serverUrl}/uploads/${image.imageUrl}`}
                   alt={`Post ${post.postId} Image`}
                   style={{
                     display: "inline-block",

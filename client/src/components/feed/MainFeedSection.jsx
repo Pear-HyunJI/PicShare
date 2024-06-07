@@ -176,7 +176,7 @@ const MainFeedSection = ({ filter }) => {
                   >
                     <PostImage
                       className="postImage"
-                      src={image.imageUrl}
+                      src={`${serverUrl}/uploads/${image.imageUrl}`}
                       alt={`Post ${post.postId} Image`}
                       style={{
                         display: "inline-block",
@@ -200,7 +200,7 @@ const MainFeedSection = ({ filter }) => {
                 }}
               >
                 <PostImage
-                  src={image.imageUrl}
+                  src={`${serverUrl}/uploads/${image.imageUrl}`}
                   alt={`Post ${post.postId} Image`}
                   style={{
                     display: "inline-block",
