@@ -133,6 +133,74 @@ otherRouter.post("/post/likedUsers", (req, res) => {
 });
 
 //댓글쓰기
+// otherRouter.post("/post/comment", (req, res) => {
+//   console.log("댓글 저장 요청이 도착했습니다.");
+//   db.getConnection((err, connection) => {
+//     if (err) {
+//       console.error("에러", err);
+//       res.status(500).send("실패");
+//       return;
+//     }
+
+//     connection.beginTransaction((err) => {
+//       if (err) {
+//         console.error("에러", err);
+//         res.status(500).send("실패");
+//         connection.release();
+//         return;
+//       }
+
+//       const { postId, comment, userNo } = req.body;
+//       // const dateValue = new Date();
+//       const date = dayjs();
+
+//       console.log("서버에서 댓글", postId, comment, userNo, date)
+
+//       const insertCommentQuery = `
+//         INSERT INTO comments (postId, comment, userNo, date) 
+//         VALUES (?, ?, ?, ?)
+//       `;
+
+//       connection.query(
+//         insertCommentQuery,
+//         [postId, comment, userNo, date.format("YYYY-MM-DD HH:mm:ss")],
+//         (err, result) => {
+//           if (err) {
+//             return connection.rollback(() => {
+//               connection.release();
+//               res.status(500).send(err);
+//             });
+//           }
+
+//           if(result, affectedRows !== 0){
+
+//             connection.commit((err) => {
+//               if (err) {
+//                 return connection.rollback(() => {
+//                   connection.release();
+//                   res.status(500).send(err);
+//                 });
+//               }
+  
+//               console.log("댓글이 성공적으로 저장되었습니다.");
+//               connection.release();
+//               // res.send("댓글이 성공적으로 저장되었습니다.");
+//               res.send(result);
+//             });
+//           } else{
+//             connection.rollback(() => {
+//               connection.release();
+//               res.status(500).send("댓글실패");
+//             });
+//           }
+ 
+//         }
+//       );
+//     });
+//   });
+// });
+
+//댓글쓰기
 otherRouter.post("/post/comment", (req, res) => {
   console.log("댓글 저장 요청이 도착했습니다.");
   db.getConnection((err, connection) => {
@@ -151,7 +219,9 @@ otherRouter.post("/post/comment", (req, res) => {
       }
 
       const { postId, comment, userNo } = req.body;
-      const date = dayjs();
+      const date = dayjs().format("YYYY-MM-DD HH:mm:ss"); // 현재 날짜 및 시간을 포맷팅
+
+      console.log("서버에서 댓글", postId, comment, userNo, date);
 
       const insertCommentQuery = `
         INSERT INTO comments (postId, comment, userNo, date) 
@@ -160,7 +230,7 @@ otherRouter.post("/post/comment", (req, res) => {
 
       connection.query(
         insertCommentQuery,
-        [postId, comment, userNo, date.format("YYYY-MM-DD HH:mm:ss")],
+        [postId, JSON.stringify(comment), userNo, date],
         (err, result) => {
           if (err) {
             return connection.rollback(() => {
@@ -179,7 +249,8 @@ otherRouter.post("/post/comment", (req, res) => {
 
             console.log("댓글이 성공적으로 저장되었습니다.");
             connection.release();
-            res.send("댓글이 성공적으로 저장되었습니다.");
+            // res.send("댓글이 성공적으로 저장되었습니다.");
+            res.send("댓글이 성공적으로 저장되었습니다."); // 클라이언트에 메시지 전달
           });
         }
       );

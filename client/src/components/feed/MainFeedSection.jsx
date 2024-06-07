@@ -87,6 +87,7 @@ const PostFooter = styled.div`
 `;
 
 const SlideBlock = styled.div`
+  position: relative;
   width: 80%;
   height: 400px;
   background-color: #ddd;
@@ -180,36 +181,35 @@ const MainFeedSection = ({ filter }) => {
   // 엔터 키 핸들러
   const handleEnterPress = (event) => {
     if (event.key === "Enter") {
-      // 입력된 값을 서버로 전송
-      saveComment(currentPost.postId, user.userNo, mycomment);
       // 입력된 값을 comments 배열에 추가하고, mycomment 상태를 초기화
       setComments((prevComments) => [...prevComments, mycomment]);
+      // 입력된 값을 서버로 전송
+      saveComment(currentPost.postId, user.userNo, mycomment);
+      console.log("앤터쳤을ㄷ", currentPost.postId, mycomment, user.userNo)
       setMyComment("");
     }
   };
 
-  const saveComment = (postId, comment, userNo) => {
+  const saveComment = (postId, userNo, comment) => {
     console.log("댓글 저장 요청을 보냈습니다.");
-    axios("/post/comment", {
-          method: "POST",
-          body: JSON.stringify({ postId, comment, userNo }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+    axios.post(`${serverUrl}/other/post/comment`, {
+            postId: postId,
+            comment: comment,
+            userNo: userNo
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+            }
         })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("댓글이 저장되었습니다.", data);
+        .then((response) => {
+            console.log("댓글이 저장되었습니다.", response.data);
         })
         .catch((error) => {
-          console.error("댓글 저장 실패:", error);
-        });
-  };
+          console.error("댓글 저장 실패:", error.response);
+      });
+};
 
-    // 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // 위치정보 나오게
     const [clickedImageIndex, setClickedImageIndex] = useState(null);
-    // 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const handleImageClick = (index) => {
       setClickedImageIndex(index === clickedImageIndex ? null : index);
     };
@@ -243,7 +243,7 @@ const MainFeedSection = ({ filter }) => {
 
   return (
     <MainFeedSectionBlock>
-      {filteredFeeds.map((post) => (
+      {filteredFeeds.map((post, index) => (
         <PostBlock key={post.postId}>
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
@@ -278,7 +278,8 @@ const MainFeedSection = ({ filter }) => {
                       display: "flex",
                       justifyContent: "center",
                       textAlign: "center",
-                    }} onClick={() => handleImageClick(index)} >
+                    }} 
+                    onClick={() => handleImageClick(index)} >
                        <PostImage
                       className="postImage"
                       src={`${serverUrl}/uploads/${image.imageUrl}`}
@@ -312,7 +313,8 @@ const MainFeedSection = ({ filter }) => {
                   textAlign: "center",
                   width: "100%",
                   height: "400px",
-                }} onClick={() => handleImageClick(index)}
+                }} 
+                onClick={() => handleImageClick(index)}
               >
                 <PostImage
                   src={`${serverUrl}/uploads/${image.imageUrl}`}
