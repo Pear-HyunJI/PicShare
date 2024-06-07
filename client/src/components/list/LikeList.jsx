@@ -10,6 +10,7 @@ import LikeButton from "@/components/list/LikeButton";
 
 const LikeListBlock = styled.div`
   padding: 20px;
+  position: relative;
   .top {
     h2 {
       margin-bottom: 10px;
@@ -51,6 +52,15 @@ const LikeListBlock = styled.div`
       }
     }
   }
+  .like {
+    margin-top: 30px;
+    position: absolute;
+    left: 40px;
+    color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
 `;
 
 const PostBlock = styled.div`
@@ -65,18 +75,10 @@ const PostHeader = styled.div`
   align-items: center;
   margin-bottom: 10px;
   position: relative;
-  .like {
-    position: absolute;
-    right: 10px;
-    color: #f00;
-    cursor: pointer;
-    z-index: 9999;
-    font-size: 25px;
-  }
 `;
 
 const PostContent = styled.div`
-  margin: 30px 10px;
+  margin: 65px 10px;
   .hashtag {
     font-size: 17px;
   }
@@ -151,7 +153,6 @@ const LikeList = () => {
               />
               <span>{post.userNickname}</span>
             </Link>
-            <LikeButton postId={post.postId} />
           </PostHeader>
           {post.imageUrls && post.imageUrls.length > 1 ? (
             <div className="slidesection">
@@ -199,6 +200,7 @@ const LikeList = () => {
               </SlideBlock>
             ))
           )}
+          <LikeButton postId={post.postId} />
           <PostContent>
             <div className="hashtag">{post.hashtags.replace(/,/g, " ")}</div>
             <div className="content">{post.content}</div>

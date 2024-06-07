@@ -9,9 +9,11 @@ import "slick-carousel/slick/slick.css";
 import { IoMdMore } from "react-icons/io";
 import { fetchAllFeed } from "@/store/feed";
 import axios from "axios";
+import LikeButton from "@/components/list/LikeButton";
 
 const PersonalFeedDetailSectionBlock = styled.div`
   padding: 20px;
+  position: relative;
   .top {
     .tag {
       margin: 10px 0;
@@ -67,6 +69,15 @@ const PersonalFeedDetailSectionBlock = styled.div`
       }
     }
   }
+  .like {
+    margin-top: 30px;
+    position: absolute;
+    left: 40px;
+    color: #f00;
+    cursor: pointer;
+    z-index: 9999;
+    font-size: 25px;
+  }
 `;
 
 const PostBlock = styled.div`
@@ -100,7 +111,7 @@ const PostHeader = styled.div`
 `;
 
 const PostContent = styled.div`
-  margin: 30px 10px;
+  margin: 65px 10px;
   .hashtag {
     font-size: 17px;
   }
@@ -298,6 +309,7 @@ const PersonalFeedDetailSection = () => {
               </SlideBlock>
             ))
           )}
+          <LikeButton postId={post.postId} />
           <PostContent>
             <div className="hashtag"> {post.feedHashtags.join(" ")}</div>
             <div className="content">{post.content}</div>
