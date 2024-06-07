@@ -8,6 +8,8 @@ import "slick-carousel/slick/slick.css";
 import { fetchLikeList } from "@/store/like";
 import LikeButton from "@/components/list/LikeButton";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const LikeListBlock = styled.div`
   padding: 20px;
   position: relative;
@@ -142,7 +144,7 @@ const LikeList = () => {
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
               <img
-                src={`http://localhost:8001/uploads/${post.profilePicture}`}
+                src={`${serverUrl}/uploads/${post.profilePicture}`}
                 alt={post.userNickname}
                 style={{
                   width: "50px",

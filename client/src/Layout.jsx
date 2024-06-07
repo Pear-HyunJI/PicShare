@@ -11,6 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { localUser } from "@/store/member";
 import axios from "axios";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const LayoutWrapper = styled.div`
   display: flex;
   height: 100vh;
@@ -83,7 +85,7 @@ const Layout = () => {
     if (sessionStorage.getItem("loging")) {
       const { userNo } = JSON.parse(sessionStorage.getItem("loging"));
       axios
-        .post("http://localhost:8001/auth/refresh", { userNo })
+        .post(`${serverUrl}/auth/refresh`, { userNo })
         .then((res) => {
           dispatch(localUser(res.data.user));
         })

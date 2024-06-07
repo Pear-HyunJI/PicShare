@@ -5,6 +5,8 @@ import axios from "axios";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { fetchLikeList } from "@/store/like";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const LikeButtonBlock = styled.div``;
 
 const LikeButton = ({ postId }) => {
@@ -35,7 +37,7 @@ const LikeButton = ({ postId }) => {
   // useEffect(() => {
   //   if (user) {
   //     axios
-  //       .post("http://localhost:8001/other/post/likeList", {
+  //       .post(`${serverUrl}/other/post/likeList`, {
   //         userNo: user.userNo,
   //       })
   //       .then((res) => {
@@ -57,7 +59,7 @@ const LikeButton = ({ postId }) => {
   const onToggle = () => {
     if (user) {
       axios
-        .post("http://localhost:8001/other/post/likeToggle", {
+        .post(`${serverUrl}/other/post/likeToggle`, {
           post: { postId },
           userNo: user.userNo,
         })

@@ -7,6 +7,8 @@ import { FaUserCheck, FaUserTimes } from "react-icons/fa";
 import { FaCirclePlus } from "react-icons/fa6";
 // import { fecthUsers } from "@/store/member";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const FooterBlock = styled.div`
   background: #000;
   color: #fff;
@@ -70,7 +72,7 @@ const Footer = () => {
           <Profile>
             <Link to={`/personalpage/${user.userNo}`}>
               <img
-                src={`http://localhost:8001/uploads/${user.profilePicture}`}
+                src={`${serverUrl}/uploads/${user.profilePicture}`}
                 alt="프로필사진"
               />
               ({user.userNickname})

@@ -5,6 +5,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { IoIosArrowBack } from "react-icons/io";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const FeedUpdateSectionBlock = styled.form`
   max-width: 600px;
   margin: auto;
@@ -82,7 +84,7 @@ const FeedUpdateSection = () => {
     const fetchPostData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8001/feed/postbypostid`,
+          `${serverUrl}/feed/postbypostid`,
           {
             params: { postId },
           }
@@ -100,7 +102,7 @@ const FeedUpdateSection = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8001/feed/update/${postId}`, {
+      await axios.put(`${serverUrl}/feed/update/${postId}`, {
         content,
       });
       navigate("/feed");

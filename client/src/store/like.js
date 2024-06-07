@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const likeSlice = createSlice({
   name: "like",
   initialState: {
@@ -17,7 +19,7 @@ export const { initLikeList } = likeSlice.actions;
 
 export const fetchLikeList = (userNo) => async (dispatch) => {
   try {
-    const res = await axios.post("http://localhost:8001/other/post/likeList", {
+    const res = await axios.post(`${serverUrl}/other/post/likeList`, {
       userNo,
     });
     const data = res.data.map((post) => ({

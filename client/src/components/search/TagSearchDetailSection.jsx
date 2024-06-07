@@ -9,6 +9,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import LikeButton from "@/components/list/LikeButton";
 
+const serverUrl = import.meta.env.VITE_API_URL;
+
 const TagSearchDetailSectionBlock = styled.div`
   padding: 20px;
   position: relative;
@@ -174,7 +176,7 @@ const TagSearchDetailSection = () => {
           <PostHeader>
             <Link to={`/personalpage/${post.userNo}`}>
               <img
-                src={`http://localhost:8001/uploads/${post.profilePicture}`}
+                src={`${serverUrl}/uploads/${post.profilePicture}`}
                 alt={post.userNickname}
                 style={{
                   width: "50px",
