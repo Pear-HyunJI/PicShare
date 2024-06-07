@@ -11,7 +11,7 @@ import LikeButton from "@/components/list/LikeButton";
 const serverUrl = import.meta.env.VITE_API_URL;
 
 const LikeListBlock = styled.div`
-  padding: 20px;
+  padding: 30px;
   position: relative;
   .top {
     h2 {
