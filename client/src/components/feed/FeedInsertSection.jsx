@@ -4,6 +4,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { IoIosArrowBack } from "react-icons/io";
+import { MdPlace } from "react-icons/md";
 
 const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -119,7 +120,7 @@ const FeedInsertSectionBlock = styled.form`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin: 20px 0;
+    margin: 10px 0 0 0;
 
     .checkbox-label {
       display: flex;
@@ -130,9 +131,68 @@ const FeedInsertSectionBlock = styled.form`
       }
     }
 
-    .inputfield {
+    .scheduleinputfield {
       width: 100%;
     }
+    .weatherinputfield {
+      padding: 15px 10px 10px;
+      display: flex;
+
+      .infowrap {
+        width: 140px;
+
+        dispaly: flex;
+        flex-direction: column;
+        p {
+        }
+        .weatherinfo {
+          img {
+            width: 60px;
+          }
+          font-size: 25px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+      }
+      .inputwrap {
+        margin: auto;
+
+        span {
+          font-size: 12px;
+        }
+        .locationinput {
+          input {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+    // .weatherinputfield {
+    //   padding: 15px 10px 10px;
+    //   .infowrap {
+    //     // border: 1px solid red;
+    //     align-items: center;
+    //     display: flex;
+    //     .locationinfo {
+    //       // border: 1px solid green;
+    //       font-size: 20px;
+    //       margin-bottom: 14px;
+    //       width: 150px;
+    //     }
+    //     .inputwrap {
+    //       span {
+    //         font-size: 10px;
+    //       }
+    //       .locationinput {
+    //       }
+    //     }
+    //   }
+    //   .weatherinfo {
+    //     display: flex;
+    //     align-items: center;
+    //   }
+    // }
   }
 `;
 
@@ -361,23 +421,38 @@ const FeedInsertSection = () => {
             </label>
           </div>
           {showWeatherInfo && (
-            <div className="inputfield">
-              <input
-                type="text"
-                placeholder="장소 이름을 입력하세요..."
-                value={locationName}
-                onChange={handleLocationChange}
-              />
-              <button type="button" onClick={handleGetWeatherByLocation}>
-                날씨 정보 가져오기
-              </button>
-              <p>현재 위치: {locationName}</p>
-              <p>현재 날씨: {weather.weather[0].description}</p>
-              <p>온도: {weather.main.temp}°C</p>
-              <img
-                src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
-                alt={weather.weather[0].description}
-              />
+            <div className="weatherinputfield">
+              <div className="infowrap">
+                <p className="locationinfo">
+                  <MdPlace /> {locationName}
+                </p>
+                <div>
+                  <div className="weatherinfo">
+                    <img
+                      src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
+                      alt={weather.weather[0].description}
+                    />
+                    <p>{weather.main.temp}°C</p>
+                  </div>
+                  <p>{weather.weather[0].description}</p>
+                </div>
+              </div>
+              <div className="inputwrap">
+                <div className="locationinput">
+                  <input
+                    type="text"
+                    placeholder="장소 이름을 입력하세요..."
+                    value={locationName}
+                    onChange={handleLocationChange}
+                  />
+                  <button type="button" onClick={handleGetWeatherByLocation}>
+                    날씨 정보 가져오기
+                  </button>
+                </div>
+                <span>
+                  * 현재 위치를 자동으로 불러오거나 직접 입력할 수 있습니다.
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -397,7 +472,7 @@ const FeedInsertSection = () => {
           </div>
           {isScheduled && (
             <input
-              className="inputfield"
+              className="scheduleinputfield"
               type="datetime-local"
               value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
@@ -406,9 +481,6 @@ const FeedInsertSection = () => {
         </div>
 
         <button type="submit">포스팅</button>
-        {/* <button type="button" onClick={handleBack}>
-          뒤로가기
-        </button> */}
       </FeedInsertSectionBlock>
     </div>
   );

@@ -81,10 +81,7 @@ const Results = styled.div`
 `;
 
 const UserResult = styled.div`
-  // border: 1px solid red;
-  // width: 300px;
   display: flex;
-  // justify-content: space-between;
   align-items: center;
   margin: 20px 10px 30px;
   .imageBox {
@@ -110,13 +107,21 @@ const FeedResult = styled.div`
   flex-wrap: wrap;
   .feedresult {
     padding-bottom: 20px;
-    // border: 1px solid red;
     flex: 0 0 32%;
     text-align: center;
+    position: relative;
     img {
       display: inline-block;
       height: 200px;
       border-radius: 6px;
+    }
+    .info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px;
+      border-radius: 5px;
     }
     .hashtag {
       padding-top: 5px;
@@ -145,8 +150,10 @@ const SearchComponent = () => {
   }, [dispatch, currentUser]);
 
   useEffect(() => {
-    const userResults = allUsers.filter((user) =>
-      user.userNickname.toLowerCase().includes(searchTerm.toLowerCase())
+    const userResults = allUsers.filter(
+      (user) =>
+        user.userNo !== currentUser.userNo &&
+        user.userNickname.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(userResults);
 
@@ -156,7 +163,7 @@ const SearchComponent = () => {
       )
     );
     setFilteredFeeds(feedResults);
-  }, [searchTerm, allUsers, allFeeds]);
+  }, [searchTerm, allUsers, allFeeds, currentUser]);
 
   const settings = {
     dots: true,
@@ -188,21 +195,21 @@ const SearchComponent = () => {
           onClick={() => goToSlide(0)}
         >
           <FaAt />
-          사용자 검색하기
+          사용자 검색
         </button>
         <button
           className={currentSlide === 1 ? "active" : ""}
           onClick={() => goToSlide(1)}
         >
           <FaHashtag />
-          해시태그 검색하기
+          해시태그 검색
         </button>
         <button
           className={currentSlide === 2 ? "active" : ""}
           onClick={() => goToSlide(2)}
         >
           <MdPlace />
-          장소나 날씨 검색하기
+          위치 및 날씨 정보 검색
         </button>
       </div>
       <Slider {...settings} ref={sliderRef}>
@@ -249,18 +256,15 @@ const SearchComponent = () => {
                   key={feed.postId}
                   onClick={() => handleFeedClick(feed.postId)}
                 >
-                  <div>
-                    {feed.feedImages.length > 0 && (
-                      <img
-                        src={`${serverUrl}/uploads/${feed.feedImages[0].imageUrl}`}
-                        alt=""
-                      />
-                    )}
-                    <div className="hashtag">
-                      {" "}
-                      {feed.feedHashtags.join(" ")}
-                    </div>
+                  <div className="info">
+                    <div>{feed.feedHashtags.join(" ")}</div>
                   </div>
+                  {feed.feedImages.length > 0 && (
+                    <img
+                      src={`${serverUrl}/uploads/${feed.feedImages[0].imageUrl}`}
+                      alt=""
+                    />
+                  )}
                 </div>
               ))}
             </FeedResult>
@@ -271,21 +275,32 @@ const SearchComponent = () => {
             <span>&</span>
             <input
               type="text"
-              placeholder="해시태그 검색어를 입력하세요."
+              placeholder="위치 및 날씨 정보 검색어를 입력하세요."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </SearchField>
           <Results>
-            {filteredFeeds.map((feed) => (
-              <FeedResult
-                key={feed.postId}
-                onClick={() => handleFeedClick(feed.postId)}
-              >
-                <div>{feed.content}</div>
-                <div>Hashtags: {feed.feedHashtags.join(", ")}</div>
-              </FeedResult>
-            ))}
+            <FeedResult>
+              {filteredFeeds.map((feed) => (
+                <div
+                  className="feedresult"
+                  key={feed.postId}
+                  onClick={() => handleFeedClick(feed.postId)}
+                >
+                  <div className="info">
+                    <div>{feed.weatherInfo}</div>
+                    <div>{feed.locationName}</div>
+                  </div>
+                  {feed.feedImages.length > 0 && (
+                    <img
+                      src={`${serverUrl}/uploads/${feed.feedImages[0].imageUrl}`}
+                      alt=""
+                    />
+                  )}
+                </div>
+              ))}
+            </FeedResult>
           </Results>
         </div>
       </Slider>

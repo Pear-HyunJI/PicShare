@@ -48,7 +48,6 @@ const MainFeedSectionBlock = styled.div`
   }
 `;
 
-
 const PostBlock = styled.div`
   border: 1px solid #ddd;
   margin: 10px 0;
@@ -103,7 +102,6 @@ const PostImage = styled.img`
   position: relative; /* Added position relative */
 `;
 
-
 const Modal = styled.div`
   position: fixed;
   left: 50%;
@@ -134,7 +132,6 @@ const ModalContent = styled.div`
   }
 `;
 
-// 위치 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const LocationWrap = styled.div`
   position: absolute;
   top: 50%;
@@ -146,8 +143,14 @@ const LocationWrap = styled.div`
   border-radius: 5px;
   text-align: center;
   display: ${(props) => (props.show ? "block" : "none")};
+  p {
+    text-align: left;
+  }
+  .weatherwrap {
+    display: flex;
+    align-items: center;
+  }
 `;
-
 
 const MainFeedSection = ({ filter }) => {
   const navigate = useNavigate();
@@ -185,35 +188,39 @@ const MainFeedSection = ({ filter }) => {
       setComments((prevComments) => [...prevComments, mycomment]);
       // 입력된 값을 서버로 전송
       saveComment(currentPost.postId, user.userNo, mycomment);
-      console.log("앤터쳤을ㄷ", currentPost.postId, mycomment, user.userNo)
+      console.log("앤터쳤을ㄷ", currentPost.postId, mycomment, user.userNo);
       setMyComment("");
     }
   };
 
   const saveComment = (postId, userNo, comment) => {
     console.log("댓글 저장 요청을 보냈습니다.");
-    axios.post(`${serverUrl}/other/post/comment`, {
-            postId: postId,
-            comment: comment,
-            userNo: userNo
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-            }
-        })
-        .then((response) => {
-            console.log("댓글이 저장되었습니다.", response.data);
-        })
-        .catch((error) => {
-          console.error("댓글 저장 실패:", error.response);
+    axios
+      .post(
+        `${serverUrl}/other/post/comment`,
+        {
+          postId: postId,
+          comment: comment,
+          userNo: userNo,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("댓글이 저장되었습니다.", response.data);
+      })
+      .catch((error) => {
+        console.error("댓글 저장 실패:", error.response);
       });
-};
+  };
 
-    const [clickedImageIndex, setClickedImageIndex] = useState(null);
-    const handleImageClick = (index) => {
-      setClickedImageIndex(index === clickedImageIndex ? null : index);
-    };
-
+  const [clickedImageIndex, setClickedImageIndex] = useState(null);
+  const handleImageClick = (index) => {
+    setClickedImageIndex(index === clickedImageIndex ? null : index);
+  };
 
   useEffect(() => {
     if (filter.type === "all") {
@@ -242,46 +249,90 @@ const MainFeedSection = ({ filter }) => {
   };
 
   return (
-    <MainFeedSectionBlock>
-      {filteredFeeds.map((post, index) => (
-        <PostBlock key={post.postId}>
-          <PostHeader>
-            <Link to={`/personalpage/${post.userNo}`}>
-              <img
-                src={`${serverUrl}/uploads/${post.profilePicture}`}
-                alt={post.userNickname}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  marginRight: "10px",
-                }}
-              />
-              <span>{post.userNickname}</span>
-            </Link>
+    <>
+      {!filteredFeeds || filteredFeeds.length === 0 ? (
+        <div>피드가 없습니다.</div>
+      ) : (
+        <MainFeedSectionBlock>
+          {filteredFeeds.map((post, index) => (
+            <PostBlock key={post.postId}>
+              <PostHeader>
+                <Link to={`/personalpage/${post.userNo}`}>
+                  <img
+                    src={`${serverUrl}/uploads/${post.profilePicture}`}
+                    alt={post.userNickname}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <span>{post.userNickname}</span>
+                </Link>
 
-            <span
-              className="comment"
-              onClick={() => openModal(filteredFeeds.indexOf(post))}
-            >
-              <AiFillMessage />
-            </span>
-          </PostHeader>
-          {post.feedImages && post.feedImages.length > 1 ? (
-            <div className="slidesection">
-              <Slider {...sliderSettings}>
-                {post.feedImages.map((image) => (
+                <span
+                  className="comment"
+                  onClick={() => openModal(filteredFeeds.indexOf(post))}
+                >
+                  <AiFillMessage />
+                </span>
+              </PostHeader>
+              {post.feedImages && post.feedImages.length > 1 ? (
+                <div className="slidesection">
+                  <Slider {...sliderSettings}>
+                    {post.feedImages.map((image) => (
+                      <SlideBlock
+                        key={image.imageId}
+                        className="slideBlock"
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          textAlign: "center",
+                        }}
+                        onClick={() => handleImageClick(index)}
+                      >
+                        <PostImage
+                          className="postImage"
+                          src={`${serverUrl}/uploads/${image.imageUrl}`}
+                          alt={`Post ${post.postId} Image`}
+                          style={{
+                            display: "inline-block",
+                          }}
+                        />
+                        {clickedImageIndex === index && (
+                          <LocationWrap show>
+                            <p>
+                              <MdPlace /> {post.locationName}
+                            </p>
+                            <div className="weatherwrap">
+                              <img
+                                src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
+                                alt="Weather Icon"
+                              />{" "}
+                              <p>{post.weatherInfo}</p>
+                            </div>
+                          </LocationWrap>
+                        )}
+                      </SlideBlock>
+                    ))}
+                  </Slider>
+                </div>
+              ) : (
+                post.feedImages &&
+                post.feedImages.map((image) => (
                   <SlideBlock
                     key={image.imageId}
-                    className="slideBlock"
                     style={{
                       display: "flex",
                       justifyContent: "center",
                       textAlign: "center",
-                    }} 
-                    onClick={() => handleImageClick(index)} >
-                       <PostImage
-                      className="postImage"
+                      width: "100%",
+                      height: "400px",
+                    }}
+                    onClick={() => handleImageClick(index)}
+                  >
+                    <PostImage
                       src={`${serverUrl}/uploads/${image.imageUrl}`}
                       alt={`Post ${post.postId} Image`}
                       style={{
@@ -290,106 +341,91 @@ const MainFeedSection = ({ filter }) => {
                     />
                     {clickedImageIndex === index && (
                       <LocationWrap show>
-                        <MdPlace /> {post.locationName}
-                        <img
-                          src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
-                          alt="Weather Icon"
-                        />{" "}
-                        {post.weatherInfo}
+                        <p>
+                          <MdPlace /> {post.locationName}
+                        </p>
+                        <div className="weatherwrap">
+                          <img
+                            src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
+                            alt="Weather Icon"
+                          />{" "}
+                          <p>{post.weatherInfo}</p>
+                        </div>
                       </LocationWrap>
                     )}
                   </SlideBlock>
-                ))}
-              </Slider>
-            </div>
-          ) : (
-            post.feedImages &&
-            post.feedImages.map((image) => (
-              <SlideBlock
-                key={image.imageId}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  width: "100%",
-                  height: "400px",
-                }} 
-                onClick={() => handleImageClick(index)}
-              >
-                <PostImage
-                  src={`${serverUrl}/uploads/${image.imageUrl}`}
-                  alt={`Post ${post.postId} Image`}
-                  style={{
-                    display: "inline-block",
-                  }}
-                />
-              {clickedImageIndex === index && (
-                  <LocationWrap show>
-                    <MdPlace /> {post.locationName}
-                    <img
-                      src={`https://openweathermap.org/img/wn/${post.weathericon}.png`}
-                      alt="Weather Icon"
-                    />{" "}
-                    {post.weatherInfo}
-                  </LocationWrap>
+                ))
+              )}
+
+              <LikeButton postId={post.postId} />
+
+              <PostContent>
+                <div className="hashtag"> {post.feedHashtags.join(" ")}</div>
+                <div className="content">{post.content}</div>
+              </PostContent>
+              <PostFooter>
+                {new Date(post.created_at).getTime() !==
+                new Date(post.updated_at).getTime() ? (
+                  <div>
+                    {new Date(post.updated_at).toLocaleString()} 에 수정된
+                    게시물입니다.
+                  </div>
+                ) : (
+                  <div>
+                    Posted at: {new Date(post.created_at).toLocaleString()}
+                  </div>
                 )}
-              </SlideBlock>
-
-            ))
+              </PostFooter>
+            </PostBlock>
+          ))}
+          {showModal && currentPost && (
+            <Modal show={showModal.toString()}>
+              <ModalContent>
+                <button onClick={closeModal}>
+                  <IoMdCloseCircle />
+                </button>
+                <div className="postcontent">
+                  {currentPost.userNickname}&nbsp;:&nbsp;{currentPost.content}
+                </div>
+                <div
+                  className="comments"
+                  style={{ marginBottom: "10px", lineHeight: "2" }}
+                >
+                  {comments.map((comment, index) => (
+                    <div key={index}>
+                      {user.userNickname}&nbsp;:&nbsp;{comment}
+                      <span className="">
+                        <RiCloseFill
+                          style={{
+                            position: "absolute",
+                            marginTop: "10px",
+                            marginLeft: "10px",
+                            color: "red",
+                          }}
+                        />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mycomment">
+                  <input
+                    type="text"
+                    value={mycomment}
+                    onChange={handleInputChange}
+                    onKeyPress={handleEnterPress}
+                    placeholder="댓글을 입력하세요."
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                    }}
+                  />
+                </div>
+              </ModalContent>
+            </Modal>
           )}
-
-          <LikeButton postId={post.postId} />
-
-          <PostContent>
-            <div className="hashtag"> {post.feedHashtags.join(" ")}</div>
-            <div className="content">{post.content}</div>
-          </PostContent>
-          <PostFooter>
-            {new Date(post.created_at).getTime() !==
-            new Date(post.updated_at).getTime() ? (
-              <div>
-                {new Date(post.updated_at).toLocaleString()} 에 수정되었습니다.
-              </div>
-            ) : (
-              <div>Posted at: {new Date(post.created_at).toLocaleString()}</div>
-            )}
-          </PostFooter>
-        </PostBlock>
-      ))}
-      {showModal && currentPost && (
-        <Modal show={showModal.toString()}>
-          <ModalContent>
-            <button onClick={closeModal}>
-              <IoMdCloseCircle />
-            </button>
-            <div className="postcontent">
-              {currentPost.userNickname}&nbsp;:&nbsp;{currentPost.content}
-            </div>
-            <div className="comments" style={{ marginBottom:"10px", lineHeight: "2" }}>
-            {comments.map((comment, index) => (
-      <div key={index}>
-        {user.userNickname}&nbsp;:&nbsp;{comment}
-        <span className=""><RiCloseFill style={{ position: "absolute", marginTop:"10px", marginLeft:"10px", color: "red" }}/></span>
-      </div>
-    ))}
-            </div>
-            <div className="mycomment">
-                <input
-                  type="text"
-                  value={mycomment}
-                  onChange={handleInputChange}
-                  onKeyPress={handleEnterPress}
-                  placeholder="댓글을 입력하세요."
-                  style={{
-                    width: "100%",
-                    padding: "10px"
-                  }}/>
-            </div>
-            
-          </ModalContent>
-        </Modal>
+        </MainFeedSectionBlock>
       )}
-    </MainFeedSectionBlock>
+    </>
   );
 };
 
