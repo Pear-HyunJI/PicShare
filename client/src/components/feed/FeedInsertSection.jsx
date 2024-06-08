@@ -225,14 +225,15 @@ const FeedInsertSection = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
   const [hashtags, setHashtags] = useState([""]);
+  const [recommendedHashtags, setRecommendedHashtags] = useState([]);
   const [scheduledAt, setScheduledAt] = useState("");
   const [isScheduled, setIsScheduled] = useState(false);
-  const [showWeatherInfo, setShowWeatherInfo] = useState(false); // 체크박스 관련
+  const [showWeatherInfo, setShowWeatherInfo] = useState(false);
 
-  const [weather, setWeather] = useState(null); // 날씨 정보를 저장할 상태
-  const [locationName, setLocationName] = useState(""); // 장소 이름 저장 상태
-  const [latitude, setLatitude] = useState(null); // 위도 저장 상태
-  const [longitude, setLongitude] = useState(null); // 경도 저장 상태
+  const [weather, setWeather] = useState(null);
+  const [locationName, setLocationName] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(async (position) => {
@@ -269,6 +270,37 @@ const FeedInsertSection = () => {
     setHashtags(newHashtags);
   };
 
+  const fetchRecommendedHashtags = (weatherCondition) => {
+    let recommendedHashtags = [];
+    switch (weatherCondition) {
+      case "clear":
+        recommendedHashtags = ["#맑음", "#햇빛", "#화창한날"];
+        break;
+      case "clouds":
+        recommendedHashtags = ["#구름", "#흐림", "#잔잔한날"];
+        break;
+      case "rain":
+        recommendedHashtags = ["#비", "#우산", "#촉촉한날"];
+        break;
+      case "snow":
+        recommendedHashtags = ["#눈", "#눈오는날", "#추운날"];
+        break;
+      // 추가 날씨 조건에 따른 해시태그를 추가할 수 있습니다.
+      default:
+        recommendedHashtags = ["#오늘날씨"];
+    }
+    setRecommendedHashtags(recommendedHashtags);
+  };
+
+  const handleRecommendedHashtagClick = (hashtag) => {
+    const firstEmptyIndex = hashtags.findIndex((ht) => ht === "");
+    if (firstEmptyIndex !== -1) {
+      handleHashtagChange(firstEmptyIndex, hashtag);
+    } else {
+      setHashtags([...hashtags, hashtag]);
+    }
+  };
+
   const handleSave = async (isImmediate) => {
     const formData = new FormData();
     formData.append("userNo", user.userNo);
@@ -277,9 +309,9 @@ const FeedInsertSection = () => {
       formData.append("images", file);
     });
     formData.append("hashtags", hashtags.join(" "));
-    formData.append("weather", weather ? weather.weather[0].description : null); // 날씨 정보 추가
-    formData.append("weathericon", weather ? weather.weather[0].icon : null); // 날씨 정보 추가
-    formData.append("locationName", locationName); // 장소 이름 추가
+    formData.append("weather", weather ? weather.weather[0].description : null);
+    formData.append("weathericon", weather ? weather.weather[0].icon : null);
+    formData.append("locationName", locationName);
 
     if (!isImmediate) {
       formData.append("scheduled_at", scheduledAt || null);
@@ -316,6 +348,7 @@ const FeedInsertSection = () => {
       setLatitude(weatherData.coord.lat);
       setLongitude(weatherData.coord.lon);
       setWeather(weatherData);
+      fetchRecommendedHashtags(weatherData.weather[0].main.toLowerCase());
     } catch (err) {
       console.error("Failed to fetch weather data:", err);
       alert("날씨 정보를 가져오는데 실패했습니다. 장소 이름을 확인해주세요.");
@@ -334,7 +367,7 @@ const FeedInsertSection = () => {
         onSubmit={(e) => {
           e.preventDefault();
           if (images.length > 0) {
-            handleSave(!isScheduled); // 예약되지 않은 경우 바로 포스트함
+            handleSave(!isScheduled);
           } else {
             alert("이미지를 하나 이상 업로드해주세요.");
           }
@@ -421,66 +454,71 @@ const FeedInsertSection = () => {
             </label>
           </div>
           {showWeatherInfo && (
-            <div className="weatherinputfield">
-              <div className="infowrap">
-                <p className="locationinfo">
-                  <MdPlace /> {locationName}
-                </p>
-                <div>
-                  <div className="weatherinfo">
-                    <img
-                      src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
-                      alt={weather.weather[0].description}
-                    />
-                    <p>{weather.main.temp}°C</p>
+            <>
+              <div className="location-input">
+                <MdPlace />
+                <input
+                  type="text"
+                  placeholder="장소를 입력해주세요..."
+                  value={locationName}
+                  onChange={handleLocationChange}
+                />
+                <button
+                  type="button"
+                  onClick={handleGetWeatherByLocation}
+                  style={{ marginLeft: "10px" }}
+                >
+                  위치 검색
+                </button>
+              </div>
+              {weather && (
+                <div className="weather-info">
+                  <p>날씨: {weather.weather[0].description}</p>
+                  <p>온도: {weather.main.temp}°C</p>
+                  <div className="recommended-hashtags">
+                    {recommendedHashtags.map((hashtag, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleRecommendedHashtagClick(hashtag)}
+                        style={{
+                          margin: "0 5px",
+                          background: "#f0f0f0",
+                          border: "1px solid #ccc",
+                          borderRadius: "5px",
+                          padding: "5px 10px",
+                        }}
+                      >
+                        {hashtag}
+                      </button>
+                    ))}
                   </div>
-                  <p>{weather.weather[0].description}</p>
                 </div>
-              </div>
-              <div className="inputwrap">
-                <div className="locationinput">
-                  <input
-                    type="text"
-                    placeholder="장소 이름을 입력하세요..."
-                    value={locationName}
-                    onChange={handleLocationChange}
-                  />
-                  <button type="button" onClick={handleGetWeatherByLocation}>
-                    날씨 정보 가져오기
-                  </button>
-                </div>
-                <span>
-                  * 현재 위치를 자동으로 불러오거나 직접 입력할 수 있습니다.
-                </span>
-              </div>
-            </div>
+              )}
+            </>
           )}
         </div>
-        <div className="scheduled-section">
+        <div className="schedule-section">
           <div className="checkbox-label">
-            <p>지정된 시간에 게시물을 자동으로 올리시겠습니까?</p>
+            <p>게시물을 예약하시겠습니까?</p>
             <label>
               <input
                 type="checkbox"
                 checked={isScheduled}
                 onChange={() => setIsScheduled(!isScheduled)}
               />
-              <span style={{ color: "#09fc52", fontWeight: "bold" }}>
-                포스팅 예약하기
-              </span>
+              <span style={{ color: "#09fc52", fontWeight: "bold" }}>예약</span>
             </label>
           </div>
           {isScheduled && (
             <input
-              className="scheduleinputfield"
               type="datetime-local"
               value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
             />
           )}
         </div>
-
-        <button type="submit">포스팅</button>
+        <button type="submit">게시</button>
       </FeedInsertSectionBlock>
     </div>
   );
