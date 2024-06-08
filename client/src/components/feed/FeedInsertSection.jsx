@@ -40,7 +40,6 @@ const FeedInsertSectionBlock = styled.form`
   .top {
     margin: 10px 0;
     display: flex;
-    // justify-content: space-between;
     align-items: center;
     gap: 10px;
     margin: 20px 0 30px;
@@ -115,7 +114,70 @@ const FeedInsertSectionBlock = styled.form`
     }
   }
 
-  .scheduled-section,
+  // .location-section,
+  // .schedule-section {
+  //   padding: 15px 10px 10px;
+  //   border: 1px solid #ccc;
+  //   border-radius: 5px;
+  //   display: flex;
+  //   gap: 10px;
+
+  //   .infowrap {
+  //     width: 140px;
+  //     display: flex;
+  //     flex-direction: column;
+  //     justify-content: center;
+
+  //     p {
+  //       font-size: 20px;
+  //       margin-bottom: 5px;
+  //       display: flex;
+  //       align-items: center;
+  //       gap: 5px;
+
+  //       svg {
+  //         font-size: 30px;
+  //       }
+  //     }
+
+  //     .weatherinfo {
+  //       display: flex;
+  //       align-items: center;
+  //       gap: 5px;
+  //       img {
+  //         width: 40px;
+  //       }
+  //       p {
+  //         font-size: 20px;
+  //       }
+  //     }
+  //   }
+
+  //   .inputwrap {
+  //     display: flex;
+  //     flex-direction: column;
+  //     justify-content: center;
+  //     gap: 5px;
+
+  //     .locationinput {
+  //       display: flex;
+  //       align-items: center;
+  //       gap: 5px;
+  //       input {
+  //         width: 200px;
+  //       }
+  //       button {
+  //         padding: 8px 15px;
+  //       }
+  //     }
+
+  //     span {
+  //       font-size: 14px;
+  //       color: #888;
+  //     }
+  //   }
+  }
+   .schedule-section,
   .location-section {
     display: flex;
     flex-direction: column;
@@ -164,36 +226,11 @@ const FeedInsertSectionBlock = styled.form`
         .locationinput {
           input {
             margin-right: 5px;
+            max-width: 150px;
           }
         }
       }
     }
-    // .weatherinputfield {
-    //   padding: 15px 10px 10px;
-    //   .infowrap {
-    //     // border: 1px solid red;
-    //     align-items: center;
-    //     display: flex;
-    //     .locationinfo {
-    //       // border: 1px solid green;
-    //       font-size: 20px;
-    //       margin-bottom: 14px;
-    //       width: 150px;
-    //     }
-    //     .inputwrap {
-    //       span {
-    //         font-size: 10px;
-    //       }
-    //       .locationinput {
-    //       }
-    //     }
-    //   }
-    //   .weatherinfo {
-    //     display: flex;
-    //     align-items: center;
-    //   }
-    // }
-  }
 `;
 
 const FeedInsertSection = () => {
@@ -274,20 +311,20 @@ const FeedInsertSection = () => {
     let recommendedHashtags = [];
     switch (weatherCondition) {
       case "clear":
-        recommendedHashtags = ["#맑음", "#햇빛", "#화창한날"];
+        recommendedHashtags = ["맑음", "햇빛", "화창한날"];
         break;
       case "clouds":
-        recommendedHashtags = ["#구름", "#흐림", "#잔잔한날"];
+        recommendedHashtags = ["구름", "흐림", "잔잔한날"];
         break;
       case "rain":
-        recommendedHashtags = ["#비", "#우산", "#촉촉한날"];
+        recommendedHashtags = ["비", "우산", "촉촉한날"];
         break;
       case "snow":
-        recommendedHashtags = ["#눈", "#눈오는날", "#추운날"];
+        recommendedHashtags = ["눈", "눈오는날", "추운날"];
         break;
-      // 추가 날씨 조건에 따른 해시태그를 추가할 수 있습니다.
+      // 시간되면 다른거 추가
       default:
-        recommendedHashtags = ["#오늘날씨"];
+        recommendedHashtags = ["오늘날씨"];
     }
     setRecommendedHashtags(recommendedHashtags);
   };
@@ -455,26 +492,45 @@ const FeedInsertSection = () => {
           </div>
           {showWeatherInfo && (
             <>
-              <div className="location-input">
-                <MdPlace />
-                <input
-                  type="text"
-                  placeholder="장소를 입력해주세요..."
-                  value={locationName}
-                  onChange={handleLocationChange}
-                />
-                <button
-                  type="button"
-                  onClick={handleGetWeatherByLocation}
-                  style={{ marginLeft: "10px" }}
-                >
-                  위치 검색
-                </button>
+              <div className="weatherinputfield">
+                <div className="infowrap">
+                  <p className="locationinfo">
+                    <MdPlace /> {locationName}
+                  </p>
+                  <div>
+                    <div className="weatherinfo">
+                      {weather && (
+                        <>
+                          <img
+                            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`}
+                            alt={weather.weather[0].description}
+                          />
+                          <p>{weather.main.temp}°C</p>
+                        </>
+                      )}
+                    </div>
+                    <p>{weather && weather.weather[0].description}</p>
+                  </div>
+                </div>
+                <div className="inputwrap">
+                  <div className="locationinput">
+                    <input
+                      type="text"
+                      placeholder="장소 이름을 입력하세요..."
+                      value={locationName}
+                      onChange={handleLocationChange}
+                    />
+                    <button type="button" onClick={handleGetWeatherByLocation}>
+                      날씨 정보 가져오기
+                    </button>
+                  </div>
+                  <span>
+                    * 현재 위치를 자동으로 불러오거나 직접 입력할 수 있습니다.
+                  </span>
+                </div>
               </div>
               {weather && (
-                <div className="weather-info">
-                  <p>날씨: {weather.weather[0].description}</p>
-                  <p>온도: {weather.main.temp}°C</p>
+                <div>
                   <div className="recommended-hashtags">
                     {recommendedHashtags.map((hashtag, idx) => (
                       <button
@@ -483,13 +539,16 @@ const FeedInsertSection = () => {
                         onClick={() => handleRecommendedHashtagClick(hashtag)}
                         style={{
                           margin: "0 5px",
-                          background: "#f0f0f0",
+                          background: "#bbb",
                           border: "1px solid #ccc",
                           borderRadius: "5px",
                           padding: "5px 10px",
+                          color: "#fff",
+                          // color: "#000",
+                          fontWeight: "bold",
                         }}
                       >
-                        {hashtag}
+                        #{hashtag}
                       </button>
                     ))}
                   </div>
@@ -498,16 +557,19 @@ const FeedInsertSection = () => {
             </>
           )}
         </div>
+
         <div className="schedule-section">
           <div className="checkbox-label">
-            <p>게시물을 예약하시겠습니까?</p>
+            <p>지정된 시간에 게시물을 자동으로 올리시겠습니까?</p>
             <label>
               <input
                 type="checkbox"
                 checked={isScheduled}
                 onChange={() => setIsScheduled(!isScheduled)}
               />
-              <span style={{ color: "#09fc52", fontWeight: "bold" }}>예약</span>
+              <span style={{ color: "#09fc52", fontWeight: "bold" }}>
+                포스팅 예약하기
+              </span>
             </label>
           </div>
           {isScheduled && (
