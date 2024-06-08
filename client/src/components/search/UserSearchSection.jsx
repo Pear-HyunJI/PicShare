@@ -119,7 +119,7 @@ const FeedResult = styled.div`
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(200, 200, 200, 0.8);
       padding: 5px;
       border-radius: 5px;
     }
@@ -289,8 +289,18 @@ const SearchComponent = () => {
                   onClick={() => handleFeedClick(feed.postId)}
                 >
                   <div className="info">
-                    <div>{feed.weatherInfo}</div>
-                    <div>{feed.locationName}</div>
+                    <div>
+                      <MdPlace />
+                      {feed.locationName}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <img
+                        src={`https://openweathermap.org/img/wn/${feed.weathericon}.png`}
+                        alt="Weather Icon"
+                        style={{ width: "30px", height: "30px" }}
+                      />
+                      <div>{feed.weatherInfo}</div>
+                    </div>
                   </div>
                   {feed.feedImages.length > 0 && (
                     <img

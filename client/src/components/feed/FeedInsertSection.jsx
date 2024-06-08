@@ -114,69 +114,7 @@ const FeedInsertSectionBlock = styled.form`
     }
   }
 
-  // .location-section,
-  // .schedule-section {
-  //   padding: 15px 10px 10px;
-  //   border: 1px solid #ccc;
-  //   border-radius: 5px;
-  //   display: flex;
-  //   gap: 10px;
-
-  //   .infowrap {
-  //     width: 140px;
-  //     display: flex;
-  //     flex-direction: column;
-  //     justify-content: center;
-
-  //     p {
-  //       font-size: 20px;
-  //       margin-bottom: 5px;
-  //       display: flex;
-  //       align-items: center;
-  //       gap: 5px;
-
-  //       svg {
-  //         font-size: 30px;
-  //       }
-  //     }
-
-  //     .weatherinfo {
-  //       display: flex;
-  //       align-items: center;
-  //       gap: 5px;
-  //       img {
-  //         width: 40px;
-  //       }
-  //       p {
-  //         font-size: 20px;
-  //       }
-  //     }
-  //   }
-
-  //   .inputwrap {
-  //     display: flex;
-  //     flex-direction: column;
-  //     justify-content: center;
-  //     gap: 5px;
-
-  //     .locationinput {
-  //       display: flex;
-  //       align-items: center;
-  //       gap: 5px;
-  //       input {
-  //         width: 200px;
-  //       }
-  //       button {
-  //         padding: 8px 15px;
-  //       }
-  //     }
-
-  //     span {
-  //       font-size: 14px;
-  //       color: #888;
-  //     }
-  //   }
-  }
+ 
    .schedule-section,
   .location-section {
     display: flex;
@@ -321,6 +259,9 @@ const FeedInsertSection = () => {
         break;
       case "snow":
         recommendedHashtags = ["눈", "눈오는날", "추운날"];
+        break;
+      case "mist":
+        recommendedHashtags = ["안개", "안개낀날", "안개낀 아침"];
         break;
       // 시간되면 다른거 추가
       default:
@@ -531,20 +472,30 @@ const FeedInsertSection = () => {
               </div>
               {weather && (
                 <div>
-                  <div className="recommended-hashtags">
+                  <div
+                    className="recommended-hashtags"
+                    style={{
+                      border: "none",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <p>이런 해시태그는 어떠세요?</p>
                     {recommendedHashtags.map((hashtag, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleRecommendedHashtagClick(hashtag)}
                         style={{
+                          fontSize: "15px",
                           margin: "0 5px",
-                          background: "#bbb",
+                          background: "#fff",
                           border: "1px solid #ccc",
                           borderRadius: "5px",
                           padding: "5px 10px",
-                          color: "#fff",
+                          color: "#aaa",
                           // color: "#000",
+                          alignItems: "center",
                           fontWeight: "bold",
                         }}
                       >

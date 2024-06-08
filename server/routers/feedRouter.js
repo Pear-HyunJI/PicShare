@@ -49,8 +49,7 @@ feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
       createdAtValue,
       createdAtValue,
       locationName,
-
-      JSON.stringify(Weather),
+      Weather,
       weathericon,
     ],
 
