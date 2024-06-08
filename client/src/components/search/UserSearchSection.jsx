@@ -272,7 +272,7 @@ const SearchComponent = () => {
         </div>
         <div>
           <SearchField>
-            <span>&</span>
+            <span><MdPlace /></span>
             <input
               type="text"
               placeholder="위치 및 날씨 정보 검색어를 입력하세요."
