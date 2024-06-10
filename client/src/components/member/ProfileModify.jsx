@@ -265,6 +265,7 @@ const ProfileModify = () => {
             console.log(res.data);
             dispatch(fetchUsers());
             alert("회원탈퇴가 완료되었습니다.");
+            dispatch(userLogout());
             navigate("/login");
           } else {
             alert("삭제하지 못했습니다.");
