@@ -2,12 +2,12 @@ import React from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import LikeButton from "@/components/list/LikeButton";
+import { MdPlace } from "react-icons/md";
 
 const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -18,7 +18,6 @@ const TagSearchDetailSectionBlock = styled.div`
     .tag {
       margin: 10px 0;
       display: flex;
-      // justify-content: space-between;
       align-items: center;
       gap: 10px;
       margin: 20px 0 30px;
@@ -101,7 +100,6 @@ const PostFooter = styled.div`
 
 const SlideBlock = styled.div`
   width: 100%;
-  // height: ${({ height }) => height}px;
   height: 500px;
   background-color: #ddd;
   display: flex;
@@ -117,25 +115,33 @@ const PostImage = styled.img`
 
 const TagSearchDetailSection = () => {
   const navigate = useNavigate();
-
   const { postId } = useParams();
   const location = useLocation();
-  const { searchTerm, currentSlide } = location.state || ""; // 서치 결과 받아온거
+  const { searchTerm, currentSlide, searchType } = location.state || ""; // 서치 결과 받아온거
   const allFeeds = useSelector((state) => state.feeds.feeds);
 
-  const filteredFeeds = allFeeds.filter((feed) =>
-    feed.feedHashtags.some((hashtag) =>
-      hashtag.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  // 검색 타입에 따라 필터링 로직 변경
+  let filteredFeeds = [];
+  if (searchType === "hashtag") {
+    filteredFeeds = allFeeds.filter((feed) =>
+      feed.feedHashtags.some((hashtag) =>
+        hashtag.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  } else if (searchType === "location") {
+    filteredFeeds = allFeeds.filter(
+      (feed) =>
+        (feed.locationName &&
+          feed.locationName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (feed.weatherInfo &&
+          feed.weatherInfo.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }
 
   const postIndex = filteredFeeds.findIndex(
     (feed) => feed.postId === parseInt(postId)
   );
   const postsToDisplay = filteredFeeds.slice(postIndex);
-
-  console.log("필터드피드~", filteredFeeds);
-  console.log("서치텀~", postsToDisplay);
 
   const handleBack = () => {
     navigate(-1, { state: { currentSlide } });
@@ -156,7 +162,15 @@ const TagSearchDetailSection = () => {
           <button onClick={handleBack}>
             <IoIosArrowBack />
           </button>
-          <h2>#{searchTerm}</h2>
+          {searchType === "hashtag" ? (
+            <h2>#{searchTerm}</h2>
+          ) : (
+            <h2>
+              <MdPlace />
+              {searchTerm}
+            </h2>
+          )}
+          {/* <h2>#{searchTerm}</h2> */}
         </div>
         <div className="num">
           <span>게시물{postsToDisplay.length}개</span>

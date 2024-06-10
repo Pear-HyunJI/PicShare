@@ -132,6 +132,7 @@ const FeedResult = styled.div`
 const SearchComponent = () => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("user"); // 검색 유형 상태 추가
   const currentUser = useSelector((state) => state.members.user);
   const allUsers = useSelector((state) => state.members.users);
   const allFeeds = useSelector((state) => state.feeds.feeds);
@@ -150,20 +151,36 @@ const SearchComponent = () => {
   }, [dispatch, currentUser]);
 
   useEffect(() => {
-    const userResults = allUsers.filter(
-      (user) =>
-        user.userNo !== currentUser.userNo &&
-        user.userNickname.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredUsers(userResults);
-
-    const feedResults = allFeeds.filter((feed) =>
-      feed.feedHashtags.some((hashtag) =>
-        hashtag.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-    setFilteredFeeds(feedResults);
-  }, [searchTerm, allUsers, allFeeds, currentUser]);
+    if (searchType === "user") {
+      const userResults = allUsers.filter(
+        (user) =>
+          user.userNo !== currentUser.userNo &&
+          user.userNickname.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(userResults);
+      setFilteredFeeds([]);
+    } else {
+      const feedResults = allFeeds.filter((feed) => {
+        if (searchType === "hashtag") {
+          return feed.feedHashtags.some((hashtag) =>
+            hashtag.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        } else if (searchType === "location") {
+          return (
+            (feed.locationName &&
+              feed.locationName
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())) ||
+            (feed.weatherInfo &&
+              feed.weatherInfo.toLowerCase().includes(searchTerm.toLowerCase()))
+          );
+        }
+        return false;
+      });
+      setFilteredFeeds(feedResults);
+      setFilteredUsers([]);
+    }
+  }, [searchTerm, searchType, allUsers, allFeeds, currentUser]);
 
   const settings = {
     dots: true,
@@ -179,11 +196,14 @@ const SearchComponent = () => {
       sliderRef.current.slickGoTo(index);
     }
     setCurrentSlide(index);
+    if (index === 0) setSearchType("user");
+    else if (index === 1) setSearchType("hashtag");
+    else if (index === 2) setSearchType("location");
   };
 
   const handleFeedClick = (postId) => {
     navigate(`/tagsearchdetail/${postId}`, {
-      state: { searchTerm, currentSlide },
+      state: { searchTerm, currentSlide, searchType },
     });
   };
 
@@ -272,7 +292,9 @@ const SearchComponent = () => {
         </div>
         <div>
           <SearchField>
-            <span><MdPlace /></span>
+            <span>
+              <MdPlace />
+            </span>
             <input
               type="text"
               placeholder="위치 및 날씨 정보 검색어를 입력하세요."
