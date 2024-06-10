@@ -295,6 +295,8 @@ const FeedInsertSection = () => {
       formData.append("scheduled_at", scheduledAt || null);
     }
 
+    console.log("보내는 폼데이터:", formData);
+
     try {
       await axios.post(`${serverUrl}/feed/insert`, formData, {
         headers: {

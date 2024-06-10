@@ -16,6 +16,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 feedRouter.post("/insert", upload.array("images", 10), (req, res) => {
+  console.log("서버에서 받은 폼데이터", req.body);
+
   const {
     userNo,
     content,
