@@ -6,6 +6,7 @@ import logo from "../../assets/images/PicShare.png";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { userLogin } from "@/store/member";
+import {  useGoogleLogin } from '@react-oauth/google';
 
 const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -94,10 +95,7 @@ const LoginSection = () => {
     }
 
     try {
-      const response = await axios.post(`${serverUrl}/auth/login`, {
-        email,
-        password,
-      });
+      const response = await axios.post(`${serverUrl}/auth/login`, {email, password});
       console.log(response.data);
       dispatch(userLogin(response.data));
       navigate("/feed");
@@ -110,6 +108,37 @@ const LoginSection = () => {
       }
     }
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async tokenResponse => {
+        try {
+                const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                console.log("구글에서 온 정보 :", userInfo)
+                const { sub:googleId, email } = userInfo.data;
+
+                axios.post(`${serverUrl}/auth/googleLogin`, { googleId, email })
+                .then((res) => {
+                    if (res.data) {
+                        alert("구글 계정으로 로그인되었습니다.");
+                        console.log(res.data)
+                        userLogin(res.data)
+                        navigate("/feed");
+                    } else {
+                        alert("Google 로그인에 실패했습니다.");
+                    }
+                })
+                .catch(err => console.log(err));    
+
+        } catch (error) {
+            console.error("Google 로그인 에러:", error);
+        }
+    },
+    onError: errorResponse => {
+        console.error("Google 로그인 에러:", errorResponse);
+    }
+ })
 
   return (
     <LoginSectionBlock>
@@ -158,7 +187,9 @@ const LoginSection = () => {
           <p style={{ color: "gray" }}>
             ­―――――――――&nbsp;&nbsp;또는&nbsp;&nbsp;―――――――――
           </p>
-          <button>Facebook으로 로그인</button>
+          <div className="google">
+            <button onClick={googleLogin}>Google로 로그인</button>
+          </div>
           <p>
             계정이 없으신가요?&nbsp;&nbsp;
             <Link to="/join" className="textColor">

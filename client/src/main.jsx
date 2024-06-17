@@ -6,6 +6,9 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "@/assets/css/reset.css";
 import ScrollToTop from "./ScrolooTop";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const googleClientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode> 태그로 이 감싸져있으면
@@ -14,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <BrowserRouter>
       <ScrollToTop />
+      <GoogleOAuthProvider clientId={googleClientId}>
       <App />
+      </GoogleOAuthProvider>
     </BrowserRouter>
   </Provider>
   // </React.StrictMode>,
