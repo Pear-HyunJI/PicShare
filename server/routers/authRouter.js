@@ -129,10 +129,69 @@ authRouter.post("/login", (req, res) => {
   );
 });
 
+// 구글아이디로 로그인
+authRouter.post('/googleLogin', (req, res) => {
+  const { googleId, email } = req.body;
+  // const registerDate = dayjs();
+
+  // 이미 등록된 사용자인지 확인하기 위해 데이터베이스에서 해당 이메일로 사용자 조회
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, result) => {
+      if (err) {
+          throw err;
+      } else {
+          // 이미 등록된 사용자인 경우
+          if (result.length > 0) {
+              const existingUser = result[0];
+              // 구글 ID가 이미 존재하는 경우 해당 사용자 정보를 업데이트
+              if (!existingUser.googleId) {
+                  db.query('UPDATE users SET googleId = ?, loginType = ? WHERE email = ?', [googleId, 'google', email], (err, updateResult) => {
+                      if (err) {
+                          throw err;
+                      } else {
+                          // 업데이트가 성공하면 업데이트된 사용자 정보 반환
+                          db.query('SELECT * FROM users WHERE email = ?', [email], (err, updatedUser) => {
+                              if (err) {
+                                  throw err;
+                              } else {
+                                  res.send(updatedUser[0]);
+                              }
+                          });
+                      }
+                  });
+              } else {
+                  db.query('SELECT * FROM users WHERE googleId = ?', [googleId], (err, updatedUser) => {
+                      if (err) {
+                          throw err;
+                      } else {
+                          res.send(updatedUser[0]);
+                      }
+                  });
+              }
+          } else {
+              // 새로운 사용자 등록
+              db.query('INSERT INTO users (googleId, email, loginType) VALUES (?, ?, ?)', [googleId, email, 'google'], (err, insertResult) => {
+                  if (err) {
+                      throw err;
+                  } else {
+                      // 새로운 사용자 등록 후 해당 사용자 정보 반환
+                      db.query('SELECT * FROM users WHERE email = ?', [email], (err, newUser) => {
+                          if (err) {
+                              throw err;
+                          } else {
+                              res.send(newUser[0]);
+                          }
+                      });
+                  }
+              });
+          }
+      }
+  });
+});
+
 // LOGOUT 기능
 authRouter.post("/remove", (req, res) => {
   const userNo = req.body.userNo;
-  db.query("DELETE FROM membertbl WHERE userNo=?", [userNo], (err, result) => {
+  db.query("DELETE FROM users WHERE userNo=?", [userNo], (err, result) => {
     if (err) {
       throw err;
     } else {
@@ -279,118 +338,6 @@ authRouter.delete("/delete", (req, res) => {
   });
 });
 
-// 프로필사진 및 닉네임 수정 기능
-// authRouter.put("/update-profile", upload.single("photo"), (req, res) => {
-//   const { userNo, userNickname, currentPassword, newPassword } = req.body;
-//   const photo = req.file ? req.file.filename : "defaultProfile.jpg";
-//   console.log("서버 포토", photo);
-
-//   // 닉네임만
-//   if (!photo) {
-//     db.query(
-//       `UPDATE users SET userNickname = ? WHERE userNo = ?`,
-//       [userNickname, userNo],
-//       (err, result) => {
-//         if (err) {
-//           return res.status(500).json({
-//             message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//           });
-//         }
-//         res.status(200).json({ affectedRows: result.affectedRows });
-//       }
-//     );
-//   }
-
-//   // 프로필 사진과 닉네임
-//   db.query(
-//     `UPDATE users SET profilePicture = ?, userNickname = ? WHERE userNo = ?`,
-//     [photo, userNickname, userNo],
-//     (err, result1) => {
-//       if (err) {
-//         return res.status(500).json({
-//           message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//         });
-//       }
-//       res.status(200).json({ affectedRows: result1.affectedRows });
-//     }
-//   );
-
-//   // 비밀번호를 변경할 떼
-//   if (newPassword) {
-//     // 현재 비밀번호 확인
-//     db.query(
-//       "SELECT * FROM users WHERE userNo = ?",
-//       [userNo],
-//       (err, results) => {
-//         if (err) {
-//           return res.status(500).json({
-//             message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//           });
-//         }
-//         const user = results[0];
-//         if (user.password !== currentPassword) {
-//           return res.status(400).json({
-//             field: "currentPassword",
-//             message: "현재 비밀번호가 일치하지 않습니다.",
-//           });
-//         }
-
-//         // 새로운 비밀번호로 업데이트
-//         db.query(
-//           "UPDATE users SET password = ? WHERE userNo = ?",
-//           [newPassword, userNo],
-//           (err, results) => {
-//             if (err) {
-//               return res.status(500).json({
-//                 message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//               });
-//             }
-//             res.status(200).json({ affectedRows: results.affectedRows });
-//           }
-//         );
-//       }
-//     );
-//   }
-// });
-
-// 비밀번호 변경 기능
-// authRouter.put("/update-password", (req, res) => {
-//   const { currentPassword, newPassword } = req.body;
-
-//   // 현재 비밀번호 확인
-//   db.query(
-//     "SELECT * FROM users WHERE userNo = ?",
-//     [req.body.userNo],
-//     (err, results) => {
-//       if (err) {
-//         return res.status(500).json({
-//           message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//         });
-//       }
-//       const user = results[0];
-//       if (user.password !== currentPassword) {
-//         return res.status(400).json({
-//           field: "currentPassword",
-//           message: "현재 비밀번호가 일치하지 않습니다.",
-//         });
-//       }
-
-//       // 새로운 비밀번호로 업데이트
-//       db.query(
-//         "UPDATE users SET password = ? WHERE userNo = ?",
-//         [newPassword, req.body.userNo],
-//         (err, result) => {
-//           if (err) {
-//             return res.status(500).json({
-//               message: "서버 오류가 발생했습니다. 다시 시도해주세요.",
-//             });
-//           }
-//           res.status(200).json({ affectedRows: result.affectedRows });
-//         }
-//       );
-//     }
-//   );
-// });
 
 authRouter.put("/update-profile", upload.single("photo"), (req, res) => {
   const { userNo, userNickname, currentPassword, newPassword } = req.body;
