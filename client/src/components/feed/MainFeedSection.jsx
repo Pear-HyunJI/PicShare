@@ -7,12 +7,9 @@ import "slick-carousel/slick/slick.css";
 import { fetchAllFeed } from "@/store/feed";
 import { AiFillMessage } from "react-icons/ai";
 import { IoMdCloseCircle } from "react-icons/io";
-import { RiCloseFill } from "react-icons/ri";
 import LikeButton from "@/components/list/LikeButton";
 import axios from "axios";
 import { MdPlace } from "react-icons/md";
-
-// import { fetchLikeList } from "@/store/like";
 
 const serverUrl = import.meta.env.VITE_API_URL;
 
@@ -129,6 +126,14 @@ const ModalContent = styled.div`
   .postcontent {
     margin: 20px 0px;
     font-weight: bold;
+    }
+    p {
+      margin: 20px 0px;
+      font-size:12px;
+      font-weight: 100;
+      .error{
+        color:red;
+      }
   }
 `;
 
@@ -153,28 +158,27 @@ const LocationWrap = styled.div`
 `;
 
 const MainFeedSection = ({ filter }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
   const { feeds, loading, error } = useSelector((state) => state.feeds);
   const user = useSelector((state) => state.members.user);
 
-  // 댓글창
   const [showModal, setShowModal] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
+  const [mycomment, setMyComment] = useState("");
+  const [comments, setComments] = useState([]);
+
 
   const openModal = (index) => {
-    setCurrentPost(feeds[index]); // post 객체 전체를 설정합니다.
+    setCurrentPost(feeds[index]);
     setShowModal(true);
+    fetchComments(feeds[index].postId);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setCurrentPost(null);
   };
-
-  //댓글
-  const [mycomment, setMyComment] = useState("");
-  const [comments, setComments] = useState([]);
 
   // 텍스트박스 변경 핸들러
   const handleInputChange = (event) => {
@@ -184,11 +188,9 @@ const MainFeedSection = ({ filter }) => {
   // 엔터 키 핸들러
   const handleEnterPress = (event) => {
     if (event.key === "Enter") {
-      // 입력된 값을 comments 배열에 추가하고, mycomment 상태를 초기화
       setComments((prevComments) => [...prevComments, mycomment]);
-      // 입력된 값을 서버로 전송
       saveComment(currentPost.postId, user.userNo, mycomment);
-      console.log("앤터쳤을ㄷ", currentPost.postId, mycomment, user.userNo);
+      console.log("엔터", currentPost.postId, mycomment, user.userNo);
       setMyComment("");
     }
   };
@@ -216,6 +218,20 @@ const MainFeedSection = ({ filter }) => {
         console.error("댓글 저장 실패:", error.response);
       });
   };
+
+  // post마다 저장된 해당comment를 불러오는 기능필요 / 저장된post이외에 모든 post에 comment가 보이고, 새로고침하면 사라짐.(서버에는 있음)
+  // const fetchComments = async (postId) => {
+  //   try {
+  //     const response = await axios.get(`${serverUrl}/other/post/comments/${postId}`);
+  //     setComments(response.data); // 댓글 데이터를 받아와 상태에 저장
+  //   } catch (error) {
+  //     console.error("댓글 불러오기 실패:", error);
+  //     if (error.response) {
+  //       console.error("서버 응답:", error.response.data);
+  //     }
+  //   }
+  // };
+  
 
   const [clickedImageIndex, setClickedImageIndex] = useState(null);
   const handleImageClick = (index) => {
@@ -394,16 +410,6 @@ const MainFeedSection = ({ filter }) => {
                   {comments.map((comment, index) => (
                     <div key={index}>
                       {user.userNickname}&nbsp;:&nbsp;{comment}
-                      <span className="">
-                        <RiCloseFill
-                          style={{
-                            position: "absolute",
-                            marginTop: "10px",
-                            marginLeft: "10px",
-                            color: "red",
-                          }}
-                        />
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -419,6 +425,7 @@ const MainFeedSection = ({ filter }) => {
                       padding: "10px",
                     }}
                   />
+                  <p>post마다 저장된 comment를 불러오는 기능 필요함<br/><span className="error">오류- 댓글이 저장된 post이외에 모든 post에 comment(댓글)가 보이고,<br/>새로고침하면 모두 사라짐. (서버에는 있음)</span></p>
                 </div>
               </ModalContent>
             </Modal>

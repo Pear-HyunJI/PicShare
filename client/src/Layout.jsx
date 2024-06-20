@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useMediaQuery } from "react-responsive";
@@ -96,7 +96,9 @@ const Layout = () => {
     <LayoutWrapper>
       {!mobile && (
         <LeftLayoutBlock>
+          <Link to={`/login`}>
           <img src={logo} alt="로고" />
+          </Link>
           <p>
             사진으로 연결되는 세상, <br /> PicShare와 함께.
           </p>

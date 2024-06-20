@@ -13,6 +13,7 @@ const ModalOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align:center;
   z-index: 100000;
 `;
 
@@ -23,11 +24,11 @@ const ModalContent = styled.div`
   width: 300px;
   max-height: 80vh;
   overflow-y: auto;
+ 
 
   ul {
     list-style: none;
     padding: 20px 0;
-
     li {
       display: flex;
       align-items: center;

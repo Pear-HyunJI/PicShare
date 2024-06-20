@@ -8,7 +8,7 @@ otherRouter.post("/post/likeList", (req, res) => {
   const userNo = req.body.userNo;
 
   const query = `
-    SELECT 
+      SELECT 
       p.postId, 
       p.content, 
       p.userNo, 
@@ -25,6 +25,7 @@ otherRouter.post("/post/likeList", (req, res) => {
     LEFT JOIN hashtags AS h ON ph.hashtagId = h.hashtagId
     WHERE pl.userNo = ? AND pl.isLiked = 1
     GROUP BY p.postId
+    ORDER BY p.created_at ASC;
   `;
 
   db.query(query, [userNo], (err, result) => {
@@ -132,75 +133,6 @@ otherRouter.post("/post/likedUsers", (req, res) => {
   });
 });
 
-//댓글쓰기
-// otherRouter.post("/post/comment", (req, res) => {
-//   console.log("댓글 저장 요청이 도착했습니다.");
-//   db.getConnection((err, connection) => {
-//     if (err) {
-//       console.error("에러", err);
-//       res.status(500).send("실패");
-//       return;
-//     }
-
-//     connection.beginTransaction((err) => {
-//       if (err) {
-//         console.error("에러", err);
-//         res.status(500).send("실패");
-//         connection.release();
-//         return;
-//       }
-
-//       const { postId, comment, userNo } = req.body;
-//       // const dateValue = new Date();
-//       const date = dayjs();
-
-//       console.log("서버에서 댓글", postId, comment, userNo, date)
-
-//       const insertCommentQuery = `
-//         INSERT INTO comments (postId, comment, userNo, date) 
-//         VALUES (?, ?, ?, ?)
-//       `;
-
-//       connection.query(
-//         insertCommentQuery,
-//         [postId, comment, userNo, date.format("YYYY-MM-DD HH:mm:ss")],
-//         (err, result) => {
-//           if (err) {
-//             return connection.rollback(() => {
-//               connection.release();
-//               res.status(500).send(err);
-//             });
-//           }
-
-//           if(result, affectedRows !== 0){
-
-//             connection.commit((err) => {
-//               if (err) {
-//                 return connection.rollback(() => {
-//                   connection.release();
-//                   res.status(500).send(err);
-//                 });
-//               }
-  
-//               console.log("댓글이 성공적으로 저장되었습니다.");
-//               connection.release();
-//               // res.send("댓글이 성공적으로 저장되었습니다.");
-//               res.send(result);
-//             });
-//           } else{
-//             connection.rollback(() => {
-//               connection.release();
-//               res.status(500).send("댓글실패");
-//             });
-//           }
- 
-//         }
-//       );
-//     });
-//   });
-// });
-
-//댓글쓰기
 otherRouter.post("/post/comment", (req, res) => {
   console.log("댓글 저장 요청이 도착했습니다.");
   db.getConnection((err, connection) => {
@@ -258,10 +190,55 @@ otherRouter.post("/post/comment", (req, res) => {
   });
 });
 
+otherRouter.post("/post/commentList", (req, res) => {
+  const userNo = req.body.userNo;
 
-//댓글리스트
-// otherRouter.post("/post/commentList", (req, res) => {
-//   const userNo = req.body.userNo;
+  const query = `SELECT 
+                  comments.commentId,
+                  comments.userNo,
+                  comments.postId,
+                  comments.comment,
+                  comments.date
+                FROM 
+                  comments
+                WHERE 
+                  comments.userNo = ?
+                  ORDER BY comments.date DESC;
+                `;
+
+                db.query(query, [userNo], (err, results) => {
+                  if (err) {
+                    console.error('댓글 데이터를 가져오는 중 오류 발생:', err);
+                    res.status(500).json({ error: '댓글 데이터를 가져오는 중 오류 발생' });
+                    return;
+                  }
+              
+                  res.json(results);
+                });
+              });
+
+otherRouter.delete("/delete/commentList/:commentId", (req,res) => {
+  const { commentId } = req.params;
+
+  db.query("DELETE FROM comments WHERE commentId=?", [commentId], (err,commentResult) => {
+    if (err) {
+      console.log("댓글 삭제 중 에러:", err);
+      res.status(500).send("댓글 삭제 실패")
+      return;
+    }
+    res.send("댓글 삭제 완료");
+  })
+})     
+
+// 해당post의 해당comment를 불러오는 엔드포인트 (오류남)
+// otherRouter.get('/post/comments/:postId', async (req, res) => {
+//   const { postId } = req.params;
+//   try {
+//     const comments = await Comment.find({ postId }).sort({ createdAt: 'desc' });
+//     res.json(comments);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
 // });
 
 
