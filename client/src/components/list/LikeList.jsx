@@ -23,9 +23,6 @@ const LikeListBlock = styled.div`
       font-size: 18px;
       border-radius: 5px;
     }
-    .num {
-      margin: 0 0 50px;
-    }
   }
   .slidesection {
     .slick-dots {
